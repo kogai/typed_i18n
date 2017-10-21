@@ -74,23 +74,47 @@ let handle_language json =
   |> (fun (l, v) -> walk v)
 
 exception Invalid_extension of string
-let output_filename = function
+let output_filename path =
+  let filename = Filename.basename path in
+  match Filename.split_extension filename with 
   | filename, Some ("json") -> filename ^ ".js.flow" 
   | _, Some x -> raise @@ Invalid_extension (x ^ " is invalid extension")
   | _ -> raise @@ Invalid_extension "has not extension"
 
-let () =
-  let source = "fixture/locale.json" in
-  let output = "fixture/locale.js.flow" in
+module Cmd : sig
+  val name: string
+  val run: string -> string -> unit
+  val term: unit Cmdliner.Term.t
+end = struct
+  open Cmdliner
+  let name= "typed_i18n"
 
-  source
-  |> Yojson.Basic.from_file
-  |> handle_language
-  |> List.map ~f:to_flow_type
-  |> String.concat ~sep:"\n"
-  |> (fun content ->
-      let content = "//@flow\n\n" ^ content ^ "\n\n declare module.exports: {|
+  let input =
+    let doc = "Path of source locale file" in
+    Arg.(value & opt string "" & info ["i"; "input"] ~docv:"INPUT" ~doc)
+
+  let output =
+    let doc = "Directory of output distination" in
+    Arg.(value & opt string "" & info ["o"; "output"] ~docv:"OUTPUT" ~doc)
+
+  let run input output =
+    input
+    |> Yojson.Basic.from_file
+    |> handle_language
+    |> List.map ~f:to_flow_type
+    |> String.concat ~sep:"\n"
+    |> (fun content ->
+        let content = "//@flow\n\n" ^ content ^ "\n\n declare module.exports: {|
   +TFunction: typeof t;
 |};\n" in
-      Out_channel.write_all output content
-    )
+        let dist = output ^ "/" ^ output_filename input in
+        Out_channel.write_all dist content;
+        print_endline @@ "Generated in " ^ dist
+      )
+
+  let term = Term.(const run $ input $ output)
+end
+
+let () =
+  let open Cmdliner in
+  Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name)
