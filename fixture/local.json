@@ -1,0 +1,21 @@
+{
+  "ja": {
+    "title": "タイトル",
+    "body_copies": [
+      "これは",
+      "本文",
+      "です"
+    ],
+    "child": {
+      "title_of_child": "サブタイトル",
+      "allow_number": 999
+    },
+    "children": [{
+      "first_name": "太郎",
+      "familly_name": "山田"
+    }, {
+      "first_name": "花子",
+      "familly_name": "田中"
+    }]
+  }
+}
