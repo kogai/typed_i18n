@@ -81,6 +81,7 @@ let output_filename = function
 
 let () =
   let source = "fixture/locale.json" in
+  let output = "fixture/locale.js.flow" in
 
   source
   |> Yojson.Basic.from_file
@@ -88,6 +89,8 @@ let () =
   |> List.map ~f:to_flow_type
   |> String.concat ~sep:"\n"
   |> (fun content ->
-      let filename = output_filename @@ Filename.split_extension source in
-      Out_channel.write_all filename content
+      let content = "//@flow\n\n" ^ content ^ "\n\n declare module.exports: {|
+  +TFunction: typeof t;
+|};\n" in
+      Out_channel.write_all output content
     )
