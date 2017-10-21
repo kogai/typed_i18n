@@ -1,0 +1,21 @@
+opam-version: "1.2"
+name: "typed_i18n"
+version: "0.0.1"
+maintainer: "shinichi kogai <kogai0121@gmail.com>"
+authors: "Shinichi Kogai"
+homepage: "https://github.com/kogai/typed_i18n"
+bug-reports: "https://github.com/kogai/typed_i18n"
+license: "MIT"
+available: [ocaml-version >= "4.03.0"]
+dev-repo: "git@github.com:kogai/typed_i18n.git"
+build: [
+  [make]
+]
+install: [make "install"]
+remove: ["ocamlfind" "remove" "typed_i18n"]
+depends: [
+  "ocamlfind" {build}
+  "ocamlbuild" {build}
+  "ounit"
+  "sedlex"
+]

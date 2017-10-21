@@ -1,0 +1,6 @@
+S src/**
+
+B _build/**
+
+PKG ounit core yojson cmdliner
+
