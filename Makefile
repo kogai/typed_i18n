@@ -1,14 +1,15 @@
 NAME := typed_i18n
 TEST_NAME := $(NAME)_test
-PKGS := ounit,core,ppx_deriving.show,yojson,cmdliner,easy-format,js_of_ocaml
+PKGS := ounit,core,yojson,cmdliner,easy-format,js_of_ocaml,js_of_ocaml.ppx
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_DIRS := "src"
+JSFILES= +weak.js +toplevel.js +dynlink.js +nat.js
 
 OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS) -lib str
 OCB := ocamlbuild $(OCB_FLAGS)
 OPAM_VER := 4.03.0
 
-all:$(NAME).native $(NAME).byte $(NAME).js
+all:$(NAME).native $(NAME).byte bin/$(NAME)
 
 $(NAME).native: $(SRC_FILES)
 	$(OCB) $(NAME).native
@@ -16,9 +17,15 @@ $(NAME).native: $(SRC_FILES)
 $(NAME).byte: $(SRC_FILES)
 	$(OCB) $(NAME).byte
 
+# FIXME: Not working without +weak.js?
 $(NAME).js: $(NAME).byte
-	js_of_ocaml $(NAME).byte
+	js_of_ocaml $(NAME).byte --pretty
 
+bin/$(NAME): $(NAME).byte
+	mkdir -p bin
+	cp $(NAME).byte bin/$(NAME)
+
+#  -jsopt "$(JSFILES)"
 .PHONY: native
 native: $(NAME).native
 	@./$(NAME).native $(ARGS)
@@ -52,6 +59,11 @@ test-byte: $(TEST_NAME).byte
 test-ci: install
 	make test
 
+.PHONY: publish
+publish: bin/$(NAME)
+	npm version patch
+	npm publish --access public
+
 .PHONY: init
 init:
 	opam init -ya --comp=$(OPAM_VER)
@@ -67,7 +79,7 @@ install: init
 		core \
 		yojson \
 		js_of_ocaml \
-		ppx_deriving \
+		js_of_ocaml-ppx \
 		easy-format \
 		cmdliner \
 		ounit
@@ -79,5 +91,3 @@ setup: install
 .PHONY: clean
 clean:
 	$(OCB) -clean
-	@cd flow/src/parser \
-	make clean
