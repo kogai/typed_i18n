@@ -33,41 +33,36 @@ let walk json =
   in
   walk_impl "" json
 
-let rec format json =
-  let module EF = Easy_format in
-  let string_of_flow_type = match json with
-    | `List [] -> Atom ("[]", atom)
-    | `Assoc [] -> Atom ("{}", atom)
-    | `Assoc xs -> List (
-        ("{", ",", "}", list),
-        List.map ~f:format_field xs
-      )
-    | `List xs -> List (
-        ("[", ",", "]", list),
-        List.map ~f:format xs
-      )
-    | `Bool _ -> Atom ("boolean", atom)
-    | `Float _ -> Atom ("number", atom)
-    | `Int _ -> Atom ("number", atom)
-    | `String _ -> Atom ("string", atom)
-    | `Null -> Atom ("null", atom)
-  in
-
-  string_of_flow_type
+let rec format = function
+  | `List [] -> Atom ("[]", atom)
+  | `Assoc [] -> Atom ("{}", atom)
+  | `Assoc xs -> List (
+      ("{", ",", "}", list),
+      List.map ~f:format_field xs
+    )
+  | `List xs -> List (
+      ("[", ",", "]", list),
+      List.map ~f:format xs
+    )
+  | `Bool _ -> Atom ("boolean", atom)
+  | `Float _ -> Atom ("number", atom)
+  | `Int _ -> Atom ("number", atom)
+  | `String _ -> Atom ("string", atom)
+  | `Null -> Atom ("null", atom)
 and format_field (key, value) = Label ((Atom ("+" ^ key ^ ":", atom), label), format value)
 
 let to_flow_type { path; value; } =
   let fname = "t" in
   let typedef = Easy_format.Pretty.to_string @@ format value in
-  let result = "declare function " ^ fname ^ "(x: " ^ path ^ "): " ^ typedef ^ ";" in
+  let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
   result
+
+(* let handle_language = function
+   () *)
 
 let () =
   let json = Yojson.Basic.from_file "fixture/locale.json" in
   let paths = walk json in
-  List.iter
-    ~f:(fun ({ path; value; }) -> print_endline @@ "Hit key -> " ^ path ^ " = " ^ (Yojson.Basic.to_string value))
-    paths;
 
   print_endline "";
   List.iter ~f:(fun x ->
@@ -75,4 +70,4 @@ let () =
     ) paths;
   print_endline "";
 
-  print_endline @@ Yojson.Basic.pretty_to_string json
+  (* print_endline @@ Yojson.Basic.pretty_to_string json *)
