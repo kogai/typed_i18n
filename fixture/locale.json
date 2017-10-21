@@ -8,7 +8,12 @@
     ],
     "child": {
       "title_of_child": "サブタイトル",
-      "allow_number": 999
+      "variable_types": {
+        "key_of_int": 999,
+        "key_of_float": 999.999,
+        "key_of_boolean": true,
+        "key_of_null": null
+      }
     },
     "children": [{
       "first_name": "太郎",

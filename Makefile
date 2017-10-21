@@ -18,11 +18,11 @@ $(NAME).byte: $(SRC_FILES)
 
 .PHONY: native
 native: $(NAME).native
-	./$(NAME).native $(ARGS)
+	@./$(NAME).native $(ARGS)
 
 .PHONY: byte
 byte: $(NAME).byte
-	./$(NAME).byte $(ARGS)
+	@./$(NAME).byte $(ARGS)
 
 # Execute like `make ARGS=subcommand run` equivalent as `main.(native|byte) subcommand`
 .PHONY: run
