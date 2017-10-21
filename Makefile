@@ -1,6 +1,6 @@
 NAME := typed_i18n
 TEST_NAME := $(NAME)_test
-PKGS := ounit,core,ppx_deriving.show,yojson,cmdliner,easy-format
+PKGS := ounit,core,ppx_deriving.show,yojson,cmdliner,easy-format,js_of_ocaml
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_DIRS := "src"
 
@@ -8,13 +8,16 @@ OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS) -lib str
 OCB := ocamlbuild $(OCB_FLAGS)
 OPAM_VER := 4.03.0
 
-all:$(NAME).native $(NAME).byte
+all:$(NAME).native $(NAME).byte $(NAME).js
 
 $(NAME).native: $(SRC_FILES)
 	$(OCB) $(NAME).native
 
 $(NAME).byte: $(SRC_FILES)
 	$(OCB) $(NAME).byte
+
+$(NAME).js: $(NAME).byte
+	js_of_ocaml $(NAME).byte
 
 .PHONY: native
 native: $(NAME).native
@@ -63,6 +66,7 @@ install: init
 		merlin \
 		core \
 		yojson \
+		js_of_ocaml \
 		ppx_deriving \
 		easy-format \
 		cmdliner \
