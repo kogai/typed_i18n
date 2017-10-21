@@ -1,6 +1,6 @@
 NAME := typed_i18n
 TEST_NAME := $(NAME)_test
-PKGS := ounit,core,ppx_deriving.show,yojson,cmdliner
+PKGS := ounit,core,ppx_deriving.show,yojson,cmdliner,easy-format
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_DIRS := "src"
 
@@ -64,6 +64,7 @@ install: init
 		core \
 		yojson \
 		ppx_deriving \
+		easy-format \
 		cmdliner \
 		ounit
 

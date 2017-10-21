@@ -1,4 +1,5 @@
 open Core
+open Easy_format
 
 type t = {
   path: string;
@@ -32,23 +33,46 @@ let walk json =
   in
   walk_impl "" json
 
-(* json -> string(represent type of flow) *)
-let value_to_print json =
-  (* | `Assoc xs ->
-     let (key, value) = List.hd_exn xs in
-     print_endline @@ "Hit key -> " ^ key;
-     []
-     | `List x -> []
-     | `Bool x -> []
-     | `Float x -> []
-     | `Int x -> []
-     | `String x -> []
-     | `Null -> []
-  *)
-  ""
+let rec format json =
+  let module EF = Easy_format in
+  let string_of_flow_type = match json with
+    | `List [] -> Atom ("[]", atom)
+    | `Assoc [] -> Atom ("{}", atom)
+    | `Assoc xs -> List (
+        ("{", ",", "}", list),
+        List.map ~f:format_field xs
+      )
+    | `List xs -> List (
+        ("[", ",", "]", list),
+        List.map ~f:format xs
+      )
+    | `Bool _ -> Atom ("boolean", atom)
+    | `Float _ -> Atom ("number", atom)
+    | `Int _ -> Atom ("number", atom)
+    | `String _ -> Atom ("string", atom)
+    | `Null -> Atom ("null", atom)
+  in
+
+  string_of_flow_type
+and format_field (key, value) = Label ((Atom ("+" ^ key ^ ":", atom), label), format value)
+
+let to_flow_type { path; value; } =
+  let fname = "t" in
+  let typedef = Easy_format.Pretty.to_string @@ format value in
+  let result = "declare function " ^ fname ^ "(x: " ^ path ^ "): " ^ typedef ^ ";" in
+  result
 
 let () =
   let json = Yojson.Basic.from_file "fixture/locale.json" in
   let paths = walk json in
-  List.iter ~f:(fun ({ path; value; }) -> print_endline @@ "Hit key -> " ^ path ^ " = " ^ (Yojson.Basic.to_string value)) paths;
+  List.iter
+    ~f:(fun ({ path; value; }) -> print_endline @@ "Hit key -> " ^ path ^ " = " ^ (Yojson.Basic.to_string value))
+    paths;
+
+  print_endline "";
+  List.iter ~f:(fun x ->
+      print_endline @@ to_flow_type x
+    ) paths;
+  print_endline "";
+
   print_endline @@ Yojson.Basic.pretty_to_string json
