@@ -76,12 +76,10 @@ let handle_language json =
 let () =
   let json = Yojson.Basic.from_file "fixture/locale.json" in
   let paths = handle_language json in
+  let result = List.map ~f:to_flow_type paths in
+  let result = String.concat ~sep:"\n" result in
 
-  print_endline "";
-  List.iter ~f:(fun x ->
-      (* print_endline @@ "Path -> " ^ x.path *)
-      print_endline @@ to_flow_type x
-    ) paths;
-  print_endline "";
-
-  print_endline @@ Yojson.Basic.pretty_to_string json
+  print_endline result;
+  Out_channel.write_all "fixture/output.js.flow" result;
+  (* print_endline @@ Yojson.Basic.pretty_to_string json *)
+  ()
