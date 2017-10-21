@@ -73,13 +73,21 @@ let handle_language json =
   |> List.hd_exn
   |> (fun (l, v) -> walk v)
 
-let () =
-  let json = Yojson.Basic.from_file "fixture/locale.json" in
-  let paths = handle_language json in
-  let result = List.map ~f:to_flow_type paths in
-  let result = String.concat ~sep:"\n" result in
+exception Invalid_extension of string
+let output_filename = function
+  | filename, Some ("json") -> filename ^ ".js.flow" 
+  | _, Some x -> raise @@ Invalid_extension (x ^ " is invalid extension")
+  | _ -> raise @@ Invalid_extension "has not extension"
 
-  print_endline result;
-  Out_channel.write_all "fixture/output.js.flow" result;
-  (* print_endline @@ Yojson.Basic.pretty_to_string json *)
-  ()
+let () =
+  let source = "fixture/locale.json" in
+
+  source
+  |> Yojson.Basic.from_file
+  |> handle_language
+  |> List.map ~f:to_flow_type
+  |> String.concat ~sep:"\n"
+  |> (fun content ->
+      let filename = output_filename @@ Filename.split_extension source in
+      Out_channel.write_all filename content
+    )
