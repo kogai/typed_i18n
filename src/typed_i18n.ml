@@ -104,9 +104,7 @@ end = struct
     |> List.map ~f:to_flow_type
     |> String.concat ~sep:"\n"
     |> (fun content ->
-        let content = "//@flow\n\n" ^ content ^ "\n\n declare module.exports: {|
-  +TFunction: typeof t;
-|};\n" in
+        let content = "//@flow\n\n" ^ content ^ "\n\nexport default t\n" in
         let dist = output ^ "/" ^ output_filename input in
         Out_channel.write_all dist content;
         print_endline @@ "Generated in " ^ dist
