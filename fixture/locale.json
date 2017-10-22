@@ -22,5 +22,13 @@
       "first_name": "花子",
       "familly_name": "田中"
     }]
+  },
+  "en": {
+    "title": "Title",
+    "body_copies": [
+      "This",
+      "is",
+      "body_copies"
+    ]
   }
 }

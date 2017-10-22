@@ -56,20 +56,33 @@ let to_flow_type { path; value; } =
   let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
   result
 
+exception Invalid_language_key 
+
+let check_compatibility  = function
+  | [] -> raise Invalid_language_key
+  | ((primary_language, primary_json)::rest_languages) ->
+    List.iter
+      ~f:(fun (other_lang, other_json) -> 
+          if format primary_json <> format other_json then
+            print_endline @@ "Warning: [" ^ primary_language ^ "] and [" ^ other_lang ^ "] are not compatible"
+        )
+      rest_languages
+
 let handle_language json =
   let rec gather_langs = Yojson.Basic.(function
       | `Assoc [] -> []
-      | `Assoc ((l, v)::xs) -> (l, v)::(gather_langs (`Assoc xs))
+      | `Assoc ((lang, json)::xs) -> (lang, json)::(gather_langs (`Assoc xs))
       | _ -> []
     )
   in
   let languages = gather_langs json in
-  (* TODO: Check compatibility between languages
-     List.fold ~init:true ~f:(fun acc (lan, v) -> acc) languages; *)
+  check_compatibility languages;
 
   languages
-  |> List.hd_exn
-  |> (fun (l, v) -> walk v)
+  |> List.hd
+  |> (function
+      | Some (_, json) -> walk json
+      | _ -> raise Invalid_language_key)
 
 exception Invalid_extension of string
 let output_filename path =
@@ -113,10 +126,11 @@ end
 
 let () =
   let open Cmdliner in
+  let open Yojson.Basic in
   let version = "package.json"
-                |> Yojson.Basic.from_file
-                |> Yojson.Basic.Util.member "version"
-                |> Yojson.Basic.Util.to_string
+                |> from_file
+                |> Util.member "version"
+                |> Util.to_string
                 |> (fun v -> "Version: " ^ v)
   in
   Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name ~version)
