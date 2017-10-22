@@ -36,4 +36,4 @@ declare function t(_: "children.[1]"): { +first_name: string, +familly_name: str
 declare function t(_: "children.[1].first_name"): string;
 declare function t(_: "children.[1].familly_name"): string;
 
-export default t
+export type TFunction = typeof t

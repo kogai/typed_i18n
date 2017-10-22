@@ -11,28 +11,25 @@ let insert_dot k1 k2 =
   else k1 ^ "." ^ k2
 
 (* json -> t list *)
-let walk json =
-  let rec walk_impl path = Yojson.Basic.(function
-      | `Assoc xs as value ->
-        let current = { path; value; } in
-        let children = List.fold
-            xs
-            ~init:[]
-            ~f:(fun acc (k, v) -> acc @ walk_impl (insert_dot path k) v) in
-        if path = "" then children
-        else current :: children
-      | `List xs as value ->
-        let current = { path; value; } in
-        let children = List.foldi
-            xs
-            ~init:[]
-            ~f:(fun i acc x -> acc @ walk_impl (insert_dot path "[" ^ string_of_int i ^ "]") x) in
+let rec walk ?(path = "") = Yojson.Basic.(function
+    | `Assoc xs as value ->
+      let current = { path; value; } in
+      let children = List.fold
+          xs
+          ~init:[]
+          ~f:(fun acc (k, v) -> acc @ walk ~path:(insert_dot path k) v) in
+      if path = "" then children
+      else current :: children
+    | `List xs as value ->
+      let current = { path; value; } in
+      let children = List.foldi
+          xs
+          ~init:[]
+          ~f:(fun i acc x -> acc @ walk ~path:(insert_dot path "[" ^ string_of_int i ^ "]") x) in
 
-        current :: children
-      | value -> [{ path; value; }]
-    )
-  in
-  walk_impl "" json
+      current :: children
+    | value -> [{ path; value; }]
+  )
 
 let rec format = function
   | `List [] -> Atom ("[]", atom)
@@ -104,7 +101,7 @@ end = struct
     |> List.map ~f:to_flow_type
     |> String.concat ~sep:"\n"
     |> (fun content ->
-        let content = "//@flow\n\n" ^ content ^ "\n\nexport default t\n" in
+        let content = "//@flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n" in
         let dist = output ^ "/" ^ output_filename input in
         Out_channel.write_all dist content;
         print_endline @@ "Generated in " ^ dist

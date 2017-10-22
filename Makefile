@@ -8,6 +8,7 @@ JSFILES= +weak.js +toplevel.js +dynlink.js +nat.js
 OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS) -lib str
 OCB := ocamlbuild $(OCB_FLAGS)
 OPAM_VER := 4.03.0
+ARGS := -i fixture/locale.json -o fixture
 
 all:$(NAME).native $(NAME).byte bin/$(NAME)
 
