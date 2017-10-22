@@ -1,6 +1,6 @@
 {
   "name": "@kogai/typed_i18n",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "",
   "bin": "bin/typed_i18n",
   "scripts": {
