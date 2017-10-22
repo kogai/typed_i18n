@@ -7,7 +7,7 @@
 *.cmx
 *.cmxs
 *.cmxa
-*.js
+typed_i18n.js
 
 # ocamlbuild working directory
 _build/
