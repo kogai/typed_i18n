@@ -1,0 +1,22 @@
+{
+  "name": "typed_i18n_sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "../bin/typed_i18n -i ./src/locale.json -o ./src",
+    "postinstall": "flow-typed install",
+    "type": "yarn build && flow",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@kogai/typed_i18n": "0.0.3",
+    "flow-bin": "^0.57.3"
+  },
+  "dependencies": {
+    "flow-typed": "^2.2.0"
+  }
+}
