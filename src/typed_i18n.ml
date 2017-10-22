@@ -38,6 +38,7 @@ let rec format = function
       ("{", ",", "}", list),
       List.map ~f:format_field xs
     )
+  (* TODO: Handle Array(like string[]) and Tuple(like [string, number]) separately *)
   | `List xs -> List (
       ("[", ",", "]", list),
       List.map ~f:format xs
