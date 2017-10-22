@@ -113,4 +113,10 @@ end
 
 let () =
   let open Cmdliner in
-  Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name)
+  let version = "package.json"
+                |> Yojson.Basic.from_file
+                |> Yojson.Basic.Util.member "version"
+                |> Yojson.Basic.Util.to_string
+                |> (fun v -> "Version: " ^ v)
+  in
+  Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name ~version)
