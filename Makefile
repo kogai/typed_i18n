@@ -83,6 +83,7 @@ install: init
 		js_of_ocaml-ppx \
 		easy-format \
 		cmdliner \
+		ppx_blob \
 		ounit
 
 .PHONY: setup

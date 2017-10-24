@@ -128,15 +128,19 @@ end = struct
   let term = Term.(const run $ input $ output $ prefer)
 end
 
+let get_version =
+  let open Yojson.Basic in
+  let (json: string) = [%blob "../package.json"] in
+  json
+  |> from_string
+  |> Util.member "version"
+  |> Util.to_string
+  |> (fun v -> "Version: " ^ v)
+
 let () =
   let open Cmdliner in
   let open Yojson.Basic in
   (* TODO: Prefer to use https://github.com/ocaml-ppx/ppx_deriving_yojson 
      or embed directry using https://github.com/ocaml-ppx/ppx_getenv *)
-  let version = "package.json"
-                |> from_file
-                |> Util.member "version"
-                |> Util.to_string
-                |> (fun v -> "Version: " ^ v)
-  in
+  let version = get_version in
   Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name ~version)
