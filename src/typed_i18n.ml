@@ -127,6 +127,7 @@ end
 let () =
   let open Cmdliner in
   let open Yojson.Basic in
+  (* TODO: Prefer to use https://github.com/ocaml-ppx/ppx_deriving_yojson *)
   let version = "package.json"
                 |> from_file
                 |> Util.member "version"

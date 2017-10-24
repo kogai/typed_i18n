@@ -2,7 +2,7 @@
   "name": "@kogai/typed_i18n",
   "version": "0.1.2",
   "description": "",
-  "bin": "bin/typed_i18n",
+  "bin": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
