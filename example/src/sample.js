@@ -1,5 +1,5 @@
 // @flow
-import type { TFunction } from './locale';
+import type { TFunction } from './locale.translate';
 
 declare var t: TFunction;
 

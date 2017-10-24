@@ -2,9 +2,12 @@
 # yarn lockfile v1
 
 
-"@kogai/typed_i18n@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@kogai/typed_i18n/-/typed_i18n-0.0.3.tgz#a846430a78a6200e1123955f7f50b156c4eb6869"
+"@kogai/typed_i18n@../":
+  version "0.2.1"
+
+"@kogai/typed_i18n@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@kogai/typed_i18n/-/typed_i18n-0.2.1.tgz#067cc9c2d053392b27cd42ab96cd6b3d0f50cc06"
 
 ajv-keywords@^2.1.0:
   version "2.1.0"
