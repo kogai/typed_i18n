@@ -1,6 +1,6 @@
 {
   "ja": {
-    "translate": {
+    "translation": {
       "title": "タイトル",
       "body_copies": [
         "これは",
@@ -26,7 +26,7 @@
     }
   },
   "en": {
-    "translate": {
+    "translation": {
       "title": "Title",
       "body_copies": [
         "This",

@@ -121,7 +121,7 @@ end = struct
 
   let namespaces =
     let doc = "List of namespace declared in locale file" in
-    Arg.(value & opt_all string ["translate"] & info ["n"; "namespaces"] ~docv:"NAMESPACES" ~doc)
+    Arg.(value & opt_all string ["translation"] & info ["n"; "namespaces"] ~docv:"NAMESPACES" ~doc)
 
   let run input output prefer namespaces =
     input
