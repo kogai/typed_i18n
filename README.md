@@ -4,3 +4,8 @@
 
 Generate strictly typed definition of TFunction from own i18next-locale file.
 See [example](./example)
+
+```bash
+# To use namespaces
+$ typed_i18n ... -n translate -n my-namespace -n  other-namespace
+```

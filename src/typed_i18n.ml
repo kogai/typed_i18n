@@ -57,6 +57,7 @@ let to_flow_type { path; value; } =
   result
 
 exception Invalid_language_key 
+exception Invalid_namespace_key 
 
 let check_compatibility  = function
   | [] -> raise Invalid_language_key
@@ -68,7 +69,7 @@ let check_compatibility  = function
         )
       rest_languages
 
-let handle_language prefer_lang json =
+let handle_language prefer_lang namespaces json =
   let rec gather_langs = Yojson.Basic.(function
       | `Assoc [] -> []
       | `Assoc ((lang, json)::xs) -> (lang, json)::(gather_langs (`Assoc xs))
@@ -81,20 +82,26 @@ let handle_language prefer_lang json =
   languages
   |> List.find ~f:(fun (l, _) -> l = prefer_lang)
   |> (function
-      | Some (_, json) -> walk json
+      | Some (_, json) ->
+        Yojson.Basic.(namespaces
+                      |> List.map ~f:(fun name ->
+                          (match Util.member name json with
+                           | `Null -> raise Invalid_namespace_key
+                           | json -> name, (walk json))
+                        ))
       | _ -> raise Invalid_language_key)
 
 exception Invalid_extension of string
-let output_filename path =
+let output_filename path namespace =
   let filename = Filename.basename path in
   match Filename.split_extension filename with 
-  | filename, Some ("json") -> filename ^ ".js.flow" 
+  | filename, Some ("json") -> filename ^ "." ^ namespace ^ ".js.flow" 
   | _, Some x -> raise @@ Invalid_extension (x ^ " is invalid extension")
   | _ -> raise @@ Invalid_extension "has not extension"
 
 module Cmd : sig
   val name: string
-  val run: string -> string -> string -> unit
+  val run: string -> string -> string -> string list -> unit
   val term: unit Cmdliner.Term.t
 end = struct
   open Cmdliner
@@ -109,23 +116,30 @@ end = struct
     Arg.(value & opt string "" & info ["o"; "output"] ~docv:"OUTPUT" ~doc)
 
   let prefer =
-    let doc = "Specify preferred language" in
+    let doc = "Preferred language" in
     Arg.(value & opt string "en" & info ["p"; "prefer"] ~docv:"PREFER" ~doc)
 
-  let run input output prefer =
+  let namespaces =
+    let doc = "List of namespace declared in locale file" in
+    Arg.(value & opt_all string ["translate"] & info ["n"; "namespaces"] ~docv:"NAMESPACES" ~doc)
+
+  let run input output prefer namespaces =
     input
     |> Yojson.Basic.from_file
-    |> handle_language prefer
-    |> List.map ~f:to_flow_type
-    |> String.concat ~sep:"\n"
-    |> (fun content ->
-        let content = "//@flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n" in
-        let dist = output ^ "/" ^ output_filename input in
-        Out_channel.write_all dist content;
-        print_endline @@ "Generated in " ^ dist
+    |> handle_language prefer namespaces
+    |> List.iter ~f:(fun (namespace, path_and_values) ->
+        path_and_values
+        |> List.map ~f:to_flow_type
+        |> String.concat ~sep:"\n"
+        |> (fun content ->
+            let content = "//@flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n" in
+            let dist = output ^ "/" ^ output_filename input namespace in
+            Out_channel.write_all dist content;
+            print_endline @@ "Generated in " ^ dist
+          )
       )
 
-  let term = Term.(const run $ input $ output $ prefer)
+  let term = Term.(const run $ input $ output $ prefer $ namespaces)
 end
 
 let get_version =
@@ -140,7 +154,5 @@ let get_version =
 let () =
   let open Cmdliner in
   let open Yojson.Basic in
-  (* TODO: Prefer to use https://github.com/ocaml-ppx/ppx_deriving_yojson 
-     or embed directry using https://github.com/ocaml-ppx/ppx_getenv *)
   let version = get_version in
   Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name ~version)
