@@ -68,7 +68,7 @@ let check_compatibility  = function
         )
       rest_languages
 
-let handle_language json =
+let handle_language prefer_lang json =
   let rec gather_langs = Yojson.Basic.(function
       | `Assoc [] -> []
       | `Assoc ((lang, json)::xs) -> (lang, json)::(gather_langs (`Assoc xs))
@@ -79,7 +79,7 @@ let handle_language json =
   check_compatibility languages;
 
   languages
-  |> List.hd
+  |> List.find ~f:(fun (l, _) -> l = prefer_lang)
   |> (function
       | Some (_, json) -> walk json
       | _ -> raise Invalid_language_key)
@@ -94,7 +94,7 @@ let output_filename path =
 
 module Cmd : sig
   val name: string
-  val run: string -> string -> unit
+  val run: string -> string -> string -> unit
   val term: unit Cmdliner.Term.t
 end = struct
   open Cmdliner
@@ -108,10 +108,14 @@ end = struct
     let doc = "Directory of output distination" in
     Arg.(value & opt string "" & info ["o"; "output"] ~docv:"OUTPUT" ~doc)
 
-  let run input output =
+  let prefer =
+    let doc = "Specify preferred language" in
+    Arg.(value & opt string "en" & info ["p"; "prefer"] ~docv:"PREFER" ~doc)
+
+  let run input output prefer =
     input
     |> Yojson.Basic.from_file
-    |> handle_language
+    |> handle_language prefer
     |> List.map ~f:to_flow_type
     |> String.concat ~sep:"\n"
     |> (fun content ->
@@ -121,13 +125,14 @@ end = struct
         print_endline @@ "Generated in " ^ dist
       )
 
-  let term = Term.(const run $ input $ output)
+  let term = Term.(const run $ input $ output $ prefer)
 end
 
 let () =
   let open Cmdliner in
   let open Yojson.Basic in
-  (* TODO: Prefer to use https://github.com/ocaml-ppx/ppx_deriving_yojson *)
+  (* TODO: Prefer to use https://github.com/ocaml-ppx/ppx_deriving_yojson 
+     or embed directry using https://github.com/ocaml-ppx/ppx_getenv *)
   let version = "package.json"
                 |> from_file
                 |> Util.member "version"
