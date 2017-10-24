@@ -1,0 +1,14 @@
+_tags
+.gitignore
+.merlin
+Makefile
+opam
+typed_i18n.byte
+typed_i18n.js
+typed_i18n.native
+
+fixture/
+example/
+.vscode/
+_build/
+src/
