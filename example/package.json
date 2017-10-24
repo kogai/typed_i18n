@@ -5,18 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "typed_i18n -i ./src/locale.json -o ./src -p ja",
-    "postinstall": "flow-typed install",
     "type": "yarn build && flow",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "flow-bin": "^0.57.3"
-  },
+  "devDependencies": {},
   "dependencies": {
     "@kogai/typed_i18n": "../",
-    "flow-typed": "^2.2.0"
+    "flow-bin": "^0.57.3"
   }
 }
