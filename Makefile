@@ -61,8 +61,10 @@ test-ci: install
 	make test
 
 .PHONY: publish
-publish: bin/$(NAME)
+publish:
 	npm version patch
+	make bin/$(NAME)
+	git commit -a --amend --no-edit
 	npm publish --access public
 
 .PHONY: init
