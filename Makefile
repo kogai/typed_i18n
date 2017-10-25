@@ -2,6 +2,7 @@ NAME := typed_i18n
 TEST_NAME := $(NAME)_test
 PKGS := ounit,core,yojson,cmdliner,easy-format,js_of_ocaml,js_of_ocaml.ppx
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
+SRC_FILES += package.json
 SRC_DIRS := "src"
 JSFILES= +weak.js +toplevel.js +dynlink.js +nat.js
 
@@ -24,7 +25,7 @@ $(NAME).js: $(NAME).byte
 
 bin/$(NAME): $(NAME).byte
 	mkdir -p bin
-	cp $(NAME).byte bin/$(NAME)
+	cp _build/src/$(NAME).byte bin/$(NAME)
 
 #  -jsopt "$(JSFILES)"
 .PHONY: native
@@ -61,9 +62,9 @@ test-ci: install
 	make test
 
 .PHONY: publish
-publish:
+publish: clean
 	npm version patch
-	make bin/$(NAME)
+	make
 	git commit -a --amend --no-edit
 	npm publish --access public
 
