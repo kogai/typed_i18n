@@ -6,12 +6,13 @@ SRC_FILES += package.json
 SRC_DIRS := "src"
 JSFILES= +weak.js +toplevel.js +dynlink.js +nat.js
 
-OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS) -lib str
+OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS)
 OCB := ocamlbuild $(OCB_FLAGS)
 OPAM_VER := 4.03.0
 ARGS := -i fixture/locale.json -o fixture -p ja
 
-all:$(NAME).native $(NAME).byte bin/$(NAME)
+# all:$(NAME).native $(NAME).byte bin/$(NAME)
+all:$(NAME).byte
 
 $(NAME).native: $(SRC_FILES)
 	$(OCB) $(NAME).native
