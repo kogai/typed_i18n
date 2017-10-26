@@ -1,7 +1,10 @@
 // @flow
-import type { TFunction } from './locale.translate';
+import type {
+  TFunction
+} from './locale.translation';
 
-declare var t: TFunction;
+declare
+var t: TFunction;
 
 const x = t("invalid.string") // ExpectError
 const y = t("children.[1].first_name")

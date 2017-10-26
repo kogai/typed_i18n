@@ -7,6 +7,23 @@
         "本文",
         "です"
       ],
+      "support_tuple": [
+        "タプル",
+        1,
+        true
+      ],
+      "array_of_array": [
+        [1, 2],
+        [3, 4]
+      ],
+      "tuple_of_tuple": [
+        ["5", true, {
+          "foo": "bar"
+        }],
+        [
+          "foo", true, 10
+        ]
+      ],
       "child": {
         "title_of_child": "サブタイトル",
         "variable_types": {
@@ -22,7 +39,8 @@
       }, {
         "first_name": "花子",
         "familly_name": "田中"
-      }]
+      }],
+      "array_of_empty_object": [{}]
     }
   },
   "en": {

@@ -31,6 +31,8 @@ let rec walk ?(path = "") = Yojson.Basic.(function
     | value -> [{ path; value; }]
   )
 
+exception Unreachable
+
 let rec format = function
   | `List [] -> Atom ("[]", atom)
   | `Assoc [] -> Atom ("{}", atom)
@@ -38,11 +40,31 @@ let rec format = function
       ("{", ",", "}", list),
       List.map ~f:format_field xs
     )
-  (* TODO: Handle Array(like string[]) and Tuple(like [string, number]) separately *)
-  | `List xs -> List (
-      ("[", ",", "]", list),
-      List.map ~f:format xs
-    )
+  | `List xs ->
+    let result = List.map ~f:format xs in
+    let is_array = match result with
+      | [] -> raise Unreachable
+      | x::xs ->
+        let (_, result) = List.fold
+            ~init:(x, true)
+            ~f:(fun (y, is_a) x -> (x, is_a && y = x))
+            xs in
+        result
+    in
+
+    if is_array then
+      match result with
+      | [] -> raise Unreachable
+      | x::_ -> match x with
+        | Atom (x, atom) -> Atom (x ^ "[]", atom)
+        | List (x, []) -> raise Unreachable
+        | List (x, y::ys) ->
+          Atom ("{" ^ (Easy_format.Pretty.to_string y) ^ "}[]", atom)
+        | Label (x, y) -> raise Unreachable 
+        | Custom x -> raise Unreachable
+    else
+      List (("[", ",", "]", list), result)
+
   | `Bool _ -> Atom ("boolean", atom)
   | `Float _ -> Atom ("number", atom)
   | `Int _ -> Atom ("number", atom)
