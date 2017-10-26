@@ -1,6 +1,6 @@
 NAME := typed_i18n
 TEST_NAME := $(NAME)_test
-PKGS := ounit,core,yojson,cmdliner,easy-format
+PKGS := core,yojson,cmdliner,easy-format,ppx_blob
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_FILES += package.json
 SRC_DIRS := "src"
@@ -11,17 +11,29 @@ OPAM_VER := 4.03.0
 ARGS := -i fixture/locale.json -o fixture -p ja
 OS := $(shell uname -s)
 
-all:$(NAME).native $(NAME).byte bin/$(NAME)
+all:$(NAME).native $(NAME).byte bin/$(NAME).$(OS)
 
 $(NAME).native: $(SRC_FILES)
-	$(OCB) $(NAME).native
+	eval `opam config env` && \
+	$(OCB) -verbose 2 $(NAME).native
 
 $(NAME).byte: $(SRC_FILES)
+	eval `opam config env` && \
 	$(OCB) $(NAME).byte
 
-bin/$(NAME): $(NAME).native
+bin/$(NAME).$(OS): $(NAME).native
 	mkdir -p bin
 	cp _build/src/$(NAME).native bin/$(NAME).$(OS)
+
+.PHONY: mk
+mk:
+	mkdir _foo
+	ls -l
+
+.PHONY: docker
+docker:
+	# docker run -ti $(NAME):latest . bash
+	docker build -t $(NAME) .
 
 .PHONY: native
 native: $(NAME).native
@@ -62,15 +74,12 @@ publish: clean
 	git commit -a --amend --no-edit
 	npm publish --access public
 
-.PHONY: init
-init:
-	opam init -ya --comp=$(OPAM_VER)
-	opam switch $(OPAM_VER)
-	eval `opam config env`
-
 .PHONY: install
-install: init
-	opam update
+install:
+	opam init -ya --comp=$(OPAM_VER) && \
+	opam switch $(OPAM_VER) && \
+	eval `opam config env` && \
+	opam update && \
 	opam install -y \
 		ocamlfind \
 		core \
