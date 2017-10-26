@@ -15,7 +15,7 @@ all:$(NAME).native $(NAME).byte bin/$(NAME).$(OS)
 
 $(NAME).native: $(SRC_FILES)
 	eval `opam config env` && \
-	$(OCB) -verbose 2 $(NAME).native
+	$(OCB) $(NAME).native
 
 $(NAME).byte: $(SRC_FILES)
 	eval `opam config env` && \
