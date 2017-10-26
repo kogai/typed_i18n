@@ -6,8 +6,7 @@ RUN sudo chown opam /typed_i18n
 USER opam
 WORKDIR /typed_i18n
 
-VOLUME bin:/typed_i18n/bin
-
 RUN make install && \
-    make && \
-    bin/typed_i18n.Linux --version
+    make
+
+CMD bin/typed_i18n.Linux --version

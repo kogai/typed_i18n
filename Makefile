@@ -25,15 +25,11 @@ bin/$(NAME).$(OS): $(NAME).native
 	mkdir -p bin
 	cp _build/src/$(NAME).native bin/$(NAME).$(OS)
 
-.PHONY: mk
-mk:
-	mkdir _foo
-	ls -l
-
 .PHONY: docker
 docker:
-	# docker run -ti $(NAME):latest . bash
 	docker build -t $(NAME) .
+	docker run -t $(NAME)
+	docker cp $(shell docker ps -alq):/typed_i18n/bin/typed_i18n.Linux ./bin
 
 .PHONY: native
 native: $(NAME).native
@@ -71,6 +67,7 @@ test-ci: install
 publish: clean
 	npm version patch
 	make
+	make docker
 	git commit -a --amend --no-edit
 	npm publish --access public
 

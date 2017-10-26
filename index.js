@@ -5,11 +5,9 @@
 const path = require('path');
 const spawn = require('child_process').spawn;
 
-const input = process.argv.slice(2);
-const bin = path.join(__dirname, './bin/typed_i18n');
+const args = process.argv.slice(2);
+const bin = path.join(__dirname, 'bin', `typed_i18n.${process.platform.charAt(0).toUpperCase() + process.platform.slice(1)}`);
 
-console.log(bin);
-
-spawn(bin, input, {stdio: 'inherit'})
+spawn(bin, args, {stdio: 'inherit'})
   .on('exit', process.exit);
   
