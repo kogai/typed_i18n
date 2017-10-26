@@ -1,18 +1,17 @@
 NAME := typed_i18n
 TEST_NAME := $(NAME)_test
-PKGS := ounit,core,yojson,cmdliner,easy-format,js_of_ocaml,js_of_ocaml.ppx
+PKGS := ounit,core,yojson,cmdliner,easy-format
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_FILES += package.json
 SRC_DIRS := "src"
-JSFILES= +weak.js +toplevel.js +dynlink.js +nat.js
 
 OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS)
 OCB := ocamlbuild $(OCB_FLAGS)
 OPAM_VER := 4.03.0
 ARGS := -i fixture/locale.json -o fixture -p ja
+OS := $(shell uname -s)
 
-# all:$(NAME).native $(NAME).byte bin/$(NAME)
-all:$(NAME).byte
+all:$(NAME).native $(NAME).byte bin/$(NAME)
 
 $(NAME).native: $(SRC_FILES)
 	$(OCB) $(NAME).native
@@ -20,15 +19,10 @@ $(NAME).native: $(SRC_FILES)
 $(NAME).byte: $(SRC_FILES)
 	$(OCB) $(NAME).byte
 
-# FIXME: Not working without +weak.js?
-$(NAME).js: $(NAME).byte
-	js_of_ocaml $(NAME).byte --pretty
-
-bin/$(NAME): $(NAME).byte
+bin/$(NAME): $(NAME).native
 	mkdir -p bin
-	cp _build/src/$(NAME).byte bin/$(NAME)
+	cp _build/src/$(NAME).native bin/$(NAME).$(OS)
 
-#  -jsopt "$(JSFILES)"
 .PHONY: native
 native: $(NAME).native
 	@./$(NAME).native $(ARGS)
@@ -37,7 +31,6 @@ native: $(NAME).native
 byte: $(NAME).byte
 	@./$(NAME).byte $(ARGS)
 
-# Execute like `make ARGS=subcommand run` equivalent as `main.(native|byte) subcommand`
 .PHONY: run
 run: native byte
 
@@ -80,15 +73,11 @@ install: init
 	opam update
 	opam install -y \
 		ocamlfind \
-		merlin \
 		core \
 		yojson \
-		js_of_ocaml \
-		js_of_ocaml-ppx \
 		easy-format \
 		cmdliner \
-		ppx_blob \
-		ounit
+		ppx_blob
 
 .PHONY: setup
 setup: install

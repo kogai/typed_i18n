@@ -1,2 +1,2 @@
-true: annot, custom, thread
+true: annot, thread
 <src/*>: package(ppx_blob)
