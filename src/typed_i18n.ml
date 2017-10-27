@@ -19,6 +19,19 @@ module Flow_type = Translate.Translator (struct
     let definition content = "// @flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n"
   end)
 
+module Type_script = Translate.Translator (struct
+    type t = string * Yojson.Basic.json
+
+    let extension = "d.ts"
+    let read_only_tag =  Some "readonly "
+    let string_of_t format (path, value) =
+      let fname = "t" in
+      let typedef = Easy_format.Pretty.to_string @@ format value in
+      let result = "function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
+      result
+    let definition content = content ^ "\n\nexport type TFunction = typeof t\n"
+  end)
+
 let insert_dot k1 k2 =
   if k1 = "" then k2
   else k1 ^ "." ^ k2
