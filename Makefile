@@ -65,10 +65,10 @@ test-ci: install
 
 .PHONY: publish
 publish: clean
-	npm version patch
 	make
 	make docker
-	git commit -a --amend --no-edit
+	git commit -a -m "bump binary"
+	npm version patch
 	npm publish --access public
 
 .PHONY: install
