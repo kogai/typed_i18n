@@ -48,18 +48,13 @@ let rec format = function
   | `Null -> Atom ("null", atom)
 and format_field (key, value) = Label ((Atom ("+" ^ key ^ ":", atom), label), format value)
 and format_list xs =
-  let list_or_tuple = List.map ~f:format xs in
-  if is_array list_or_tuple then
-    match list_or_tuple with
+  let array_or_tuple = List.map ~f:format xs in
+  if is_array array_or_tuple then
+    match array_or_tuple with
     | [] -> raise Unreachable
-    | x::_ -> match x with
-      | Atom (x, atom) -> Atom (x ^ "[]", atom)
-      | List (x, []) -> raise Unreachable
-      | List (x, ys) as xs -> Atom (Easy_format.Pretty.to_string xs ^ "[]", atom)
-      | Label (x, y) -> raise Unreachable 
-      | Custom x -> raise Unreachable
+    | x::_ -> Atom (Easy_format.Pretty.to_string x ^ "[]", atom)
   else
-    List (("[", ",", "]", list), list_or_tuple)
+    List (("[", ",", "]", list), array_or_tuple)
 and is_array = function
   | [] -> true
   | x::xs -> xs
@@ -119,11 +114,27 @@ let output_filename path namespace =
 
 module Cmd : sig
   val name: string
+  val version: string
   val run: string -> string -> string -> string list -> unit
   val term: unit Cmdliner.Term.t
 end = struct
   open Cmdliner
-  let name= "typed_i18n"
+  let get_from_package_json key =
+    let open Yojson.Basic in
+    let (json: string) = [%blob "../package.json"] in
+    json
+    |> from_string
+    |> Util.member key
+    |> Util.to_string
+
+  let name= "name"
+            |> get_from_package_json
+            |> String.split ~on:'/'
+            |> List.last_exn
+
+  let version = "version"
+                |> get_from_package_json
+                |> (^) "Version: " 
 
   let input =
     let doc = "Path of source locale file" in
@@ -160,17 +171,8 @@ end = struct
   let term = Term.(const run $ input $ output $ prefer $ namespaces)
 end
 
-let get_version =
-  let open Yojson.Basic in
-  let (json: string) = [%blob "../package.json"] in
-  json
-  |> from_string
-  |> Util.member "version"
-  |> Util.to_string
-  |> (fun v -> "Version: " ^ v)
-
 let () =
   let open Cmdliner in
   let open Yojson.Basic in
-  let version = get_version in
-  Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name ~version)
+
+  Term.exit @@ Term.eval (Cmd.term, Term.info Cmd.name ~version: Cmd.version)
