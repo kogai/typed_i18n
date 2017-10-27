@@ -1,4 +1,4 @@
-//@flow
+// @flow
 
 declare function t(_: "title"): string;
 declare function t(_: "body_copies"): string[];

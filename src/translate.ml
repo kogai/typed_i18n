@@ -1,21 +1,29 @@
-module type Translator = sig
-  (* TODO: Consider to include from typed_i18n.ml without circular references *)
-  type t = {
-    path: string;
-    value: Yojson.Basic.json;
-  }
-
-  val read_only_tag: string
-  val t_of_string: t -> string
+module type Translatable = sig
+  type t
+  val extension: string
+  val read_only_tag: string option
+  val string_of_t: (Yojson.Basic.json -> Easy_format.t) -> t -> string
+  val definition: string -> string
 end
 
-module Flowtype (Impl: Translator) : (sig
-  type t
-  val  format: Yojson.Basic.json -> Easy_format.t
-end with type t = Impl.t) = struct
+module Translator (Impl: Translatable) : sig
+  type t = Impl.t
+
+  val format: Yojson.Basic.json -> Easy_format.t
+  val check_compatibility: (string * Yojson.Basic.json) list -> unit
+  val string_of_t: t -> string
+  val output_filename: string -> string -> string
+  val definition: string -> string
+end = struct
   open Core
   open Easy_format
   type t = Impl.t
+
+  exception Unreachable 
+  exception Invalid_language_key 
+  exception Invalid_extension of string
+
+  let definition = Impl.definition
 
   let rec format = function
     | `List [] -> Atom ("[]", atom)
@@ -30,12 +38,14 @@ end with type t = Impl.t) = struct
     | `Int _ -> Atom ("number", atom)
     | `String _ -> Atom ("string", atom)
     | `Null -> Atom ("null", atom)
-  and format_field (key, value) = Label ((Atom ("+" ^ key ^ ":", atom), label), format value)
+  and format_field (key, value) =
+    let read_only_tag = Option.value Impl.read_only_tag ~default:"" in
+    Label ((Atom (read_only_tag ^ key ^ ":", atom), label), format value)
   and format_list xs =
     let array_or_tuple = List.map ~f:format xs in
     if is_array array_or_tuple then
       match array_or_tuple with
-      | [] -> exit 1
+      | [] -> raise Unreachable
       | x::_ -> Atom (Easy_format.Pretty.to_string x ^ "[]", atom)
     else
       List (("[", ",", "]", list), array_or_tuple)
@@ -47,9 +57,22 @@ end with type t = Impl.t) = struct
                  ~f:(fun (before, is_array') next -> (next, is_array' && before = next))
                |> Tuple2.get2
 
-  (* let to_flow_type { path; value; } =
-     let fname = "t" in
-     let typedef = Easy_format.Pretty.to_string @@ format value in
-     let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
-     result *)
+  let check_compatibility  = function
+    | [] -> raise Invalid_language_key
+    | ((primary_language, primary_json)::rest_languages) ->
+      List.iter
+        ~f:(fun (other_lang, other_json) -> 
+            if format primary_json <> format other_json then
+              print_endline @@ "Warning: [" ^ primary_language ^ "] and [" ^ other_lang ^ "] are not compatible"
+          )
+        rest_languages
+
+  let string_of_t = Impl.string_of_t format
+
+  let output_filename path namespace =
+    let filename = Filename.basename path in
+    match Filename.split_extension filename with 
+    | filename, Some ("json") -> filename ^ "." ^ namespace ^ "." ^ Impl.extension 
+    | _, Some x -> raise @@ Invalid_extension (x ^ " is invalid extension")
+    | _ -> raise @@ Invalid_extension "has not extension"
 end
