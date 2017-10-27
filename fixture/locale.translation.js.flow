@@ -16,12 +16,16 @@ declare function t(_: "array_of_array.[0].[1]"): number;
 declare function t(_: "array_of_array.[1]"): number[];
 declare function t(_: "array_of_array.[1].[0]"): number;
 declare function t(_: "array_of_array.[1].[1]"): number;
-declare function t(_: "tuple_of_tuple"): [ [ string, boolean, { +foo: string } ], [ string, boolean, number ] ];
-declare function t(_: "tuple_of_tuple.[0]"): [ string, boolean, { +foo: string } ];
+declare function t(_: "tuple_of_tuple"): [
+  [ string, boolean, { +foo: string, +bar: null } ],
+  [ string, boolean, number ]
+];
+declare function t(_: "tuple_of_tuple.[0]"): [ string, boolean, { +foo: string, +bar: null } ];
 declare function t(_: "tuple_of_tuple.[0].[0]"): string;
 declare function t(_: "tuple_of_tuple.[0].[1]"): boolean;
-declare function t(_: "tuple_of_tuple.[0].[2]"): { +foo: string };
+declare function t(_: "tuple_of_tuple.[0].[2]"): { +foo: string, +bar: null };
 declare function t(_: "tuple_of_tuple.[0].[2].foo"): string;
+declare function t(_: "tuple_of_tuple.[0].[2].bar"): null;
 declare function t(_: "tuple_of_tuple.[1]"): [ string, boolean, number ];
 declare function t(_: "tuple_of_tuple.[1].[0]"): string;
 declare function t(_: "tuple_of_tuple.[1].[1]"): boolean;
@@ -46,7 +50,7 @@ declare function t(_: "child.variable_types.key_of_int"): number;
 declare function t(_: "child.variable_types.key_of_float"): number;
 declare function t(_: "child.variable_types.key_of_boolean"): boolean;
 declare function t(_: "child.variable_types.key_of_null"): null;
-declare function t(_: "children"): {+first_name: string}[];
+declare function t(_: "children"): { +first_name: string, +familly_name: string }[];
 declare function t(_: "children.[0]"): { +first_name: string, +familly_name: string };
 declare function t(_: "children.[0].first_name"): string;
 declare function t(_: "children.[0].familly_name"): string;

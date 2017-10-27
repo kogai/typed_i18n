@@ -18,7 +18,8 @@
       ],
       "tuple_of_tuple": [
         ["5", true, {
-          "foo": "bar"
+          "foo": "bar",
+          "bar": null
         }],
         [
           "foo", true, 10

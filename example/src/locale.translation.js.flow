@@ -25,7 +25,7 @@ declare function t(_: "child.variable_types.key_of_int"): number;
 declare function t(_: "child.variable_types.key_of_float"): number;
 declare function t(_: "child.variable_types.key_of_boolean"): boolean;
 declare function t(_: "child.variable_types.key_of_null"): null;
-declare function t(_: "children"): {+first_name: string}[];
+declare function t(_: "children"): { +first_name: string, +familly_name: string }[];
 declare function t(_: "children.[0]"): { +first_name: string, +familly_name: string };
 declare function t(_: "children.[0].first_name"): string;
 declare function t(_: "children.[0].familly_name"): string;

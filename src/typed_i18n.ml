@@ -40,37 +40,33 @@ let rec format = function
       ("{", ",", "}", list),
       List.map ~f:format_field xs
     )
-  | `List xs ->
-    let result = List.map ~f:format xs in
-    let is_array = match result with
-      | [] -> raise Unreachable
-      | x::xs ->
-        let (_, result) = List.fold
-            ~init:(x, true)
-            ~f:(fun (y, is_a) x -> (x, is_a && y = x))
-            xs in
-        result
-    in
-
-    if is_array then
-      match result with
-      | [] -> raise Unreachable
-      | x::_ -> match x with
-        | Atom (x, atom) -> Atom (x ^ "[]", atom)
-        | List (x, []) -> raise Unreachable
-        | List (x, y::ys) ->
-          Atom ("{" ^ (Easy_format.Pretty.to_string y) ^ "}[]", atom)
-        | Label (x, y) -> raise Unreachable 
-        | Custom x -> raise Unreachable
-    else
-      List (("[", ",", "]", list), result)
-
+  | `List xs -> format_list xs
   | `Bool _ -> Atom ("boolean", atom)
   | `Float _ -> Atom ("number", atom)
   | `Int _ -> Atom ("number", atom)
   | `String _ -> Atom ("string", atom)
   | `Null -> Atom ("null", atom)
 and format_field (key, value) = Label ((Atom ("+" ^ key ^ ":", atom), label), format value)
+and format_list xs =
+  let list_or_tuple = List.map ~f:format xs in
+  if is_array list_or_tuple then
+    match list_or_tuple with
+    | [] -> raise Unreachable
+    | x::_ -> match x with
+      | Atom (x, atom) -> Atom (x ^ "[]", atom)
+      | List (x, []) -> raise Unreachable
+      | List (x, ys) as xs -> Atom (Easy_format.Pretty.to_string xs ^ "[]", atom)
+      | Label (x, y) -> raise Unreachable 
+      | Custom x -> raise Unreachable
+  else
+    List (("[", ",", "]", list), list_or_tuple)
+and is_array = function
+  | [] -> true
+  | x::xs -> xs
+             |> List.fold
+               ~init:(x, true)
+               ~f:(fun (before, is_array') next -> (next, is_array' && before = next))
+             |> Tuple2.get2
 
 let to_flow_type { path; value; } =
   let fname = "t" in
