@@ -48,9 +48,11 @@ const x = t("foo")
 // Expect error
 const y = t("fooo")
 
-// It is ok too
-const z1: string = x.bar;
-const z2: number = x.buzz;
+// Those are also strictly typed too
+const z1: string = t("foo.bar");
+const z2: number = t("foo.buzz");
+const z3: string = x.bar;
+const z4: number = x.buzz;
 ```
 
 ### Usage

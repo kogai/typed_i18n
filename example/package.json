@@ -13,7 +13,6 @@
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
-    "@kogai/typed_i18n": "../",
     "flow-bin": "^0.57.3"
   }
 }
