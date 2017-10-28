@@ -1,9 +1,6 @@
 // @flow
 
-import type {
-  TFunction
-} from './locale.translation';
-
+import type { TFunction } from './locale.translation';
 declare var t: TFunction;
 
 // $ExpectError

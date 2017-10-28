@@ -5,3 +5,7 @@
 flow-bin@^0.57.3:
   version "0.57.3"
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.57.3.tgz#843fb80a821b6d0c5847f7bb3f42365ffe53b27b"
+
+typescript@^2.7.0-dev.20171027:
+  version "2.7.0-dev.20171027"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.0-dev.20171027.tgz#caf2c8d675e1d121bc4c4a17ae6bf924feb3feb5"

@@ -6,13 +6,14 @@
   "scripts": {
     "build": "../index.js -i ./src/locale.json -o ./src -p ja -l flow -l typescript",
     "show-version": "../index.js --version",
-    "test": "yarn show-version && yarn build && flow"
+    "test": "yarn show-version && yarn build && flow && tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
-    "flow-bin": "^0.57.3"
+    "flow-bin": "^0.57.3",
+    "typescript": "^2.7.0-dev.20171027"
   }
 }
