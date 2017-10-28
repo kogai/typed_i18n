@@ -21,3 +21,5 @@ setup.log
 .opam
 
 !sandbox/
+example/src/*.js.flow
+example/src/*.d.ts

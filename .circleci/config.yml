@@ -1,0 +1,24 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node
+    working_directory: ~/typed_i18n
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore cache
+          keys:
+            - cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "example/yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: cd example && yarn install
+      - save_cache:
+          name: Save cache
+          paths:
+            - ~/.yarn
+            - ~/typed_i18n/example/node_modules
+          key: cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "example/yarn.lock" }}
+      - run:
+          name: Run tests
+          command: make test-ci
