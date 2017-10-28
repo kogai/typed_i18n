@@ -33,6 +33,23 @@ declare function t(_: "foo.buzz"): number;
 export type TFunction = typeof t
 ```
 
+or
+
+```typescript
+declare namespace typed_i18n {
+  interface TFunction {
+    t(_: "foo"): {
+      +bar: string,
+      +buzz: number,
+    };
+    t(_: "foo.bar"): string;
+    t(_: "foo.buzz"): number;
+  }
+}
+export = typed_i18n;
+export as namespace typed_i18n;
+```
+
 then if you use TFunction like below, type-checker warn you function call by invalid path
 
 ```javascript
