@@ -63,13 +63,16 @@ test-ci:
 	cd example && \
 	yarn test
 
-.PHONY: publish
-publish: clean
+.PHONY: pre-publish
+pre-publish: clean
 	npm version patch
 	make
 	make docker
 	docker cp $(shell docker ps -alq):/typed_i18n/bin/typed_i18n.Linux ./bin
 	git commit -a -m "bump binary"
+
+.PHONY: publish
+publish: pre-publish
 	npm publish --access public
 	git push
 
