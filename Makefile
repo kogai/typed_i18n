@@ -27,8 +27,8 @@ bin/$(NAME).$(OS): $(NAME).native
 
 .PHONY: docker
 docker:
-	docker build -t $(NAME) .
-	docker run -t $(NAME)
+	docker build -t $(NAME) . && \
+	docker run -t $(NAME) && \
 	docker cp $(shell docker ps -alq):/typed_i18n/bin/typed_i18n.Linux ./bin
 
 .PHONY: native
@@ -66,10 +66,10 @@ test-ci:
 
 .PHONY: publish
 publish: clean
-	npm version patch
-	make
-	make docker
-	git commit -a -m "bump binary"
+	npm version patch && \
+	make && \
+	make docker && \
+	git commit -a -m "bump binary" && \
 	npm publish --access public
 
 .PHONY: install
