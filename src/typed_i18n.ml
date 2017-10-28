@@ -6,44 +6,49 @@ type ty = {
   value: Yojson.Basic.json;
 }
 
-module Flow = Translate.Translator (struct
-    type t = ty
-    let extension = "js.flow"
-    let read_only_tag =  Some "+"
-    let definition format {path; value;} =
-      let fname = "t" in
-      let typedef = Easy_format.Pretty.to_string @@ format value in
-      let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";"in
-      Atom (result, atom)
-    let definitions contents =
-      contents
-      |> List.map ~f:Easy_format.Pretty.to_string
-      |> String.concat ~sep:"\n"
-      |> (fun content ->
-          "// @flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n"
-        )
-  end)
+module Flow = struct
+  type t = ty
+  let extension = "js.flow"
+  let read_only_tag =  Some "+"
+  let definition format {path; value;} =
+    let fname = "t" in
+    let typedef = Easy_format.Pretty.to_string @@ format value in
+    let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";"in
+    Atom (result, atom)
+  let definitions contents =
+    contents
+    |> List.map ~f:Easy_format.Pretty.to_string
+    |> String.concat ~sep:"\n"
+    |> (fun content ->
+        "// @flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n"
+      )
+end
 
-module Typescript = Translate.Translator (struct
-    type t = ty
-    let extension = "d.ts"
-    let read_only_tag =  Some "readonly "
-    let definition format {path; value;} =
-      let typedef = Easy_format.Pretty.to_string @@ format value in
-      Atom ("(_: \""^ path ^ "\"): " ^ typedef, atom)
+module Typescript = struct
+  type t = ty
+  let extension = "d.ts"
+  let read_only_tag =  Some "readonly "
+  let definition format {path; value;} =
+    let typedef = Easy_format.Pretty.to_string @@ format value in
+    Atom ("(_: \""^ path ^ "\"): " ^ typedef, atom)
 
-    let definitions contents =
-      let methods = List (
-          ("interface TFunction {", ";", "}", list),
-          contents
-        ) in
-      let interface = Atom (Easy_format.Pretty.to_string methods, atom) in
-      let ns = List (
-          ("declare namespace typed_i18n {", "", "}", list),
-          interface::[]
-        ) in
-      Easy_format.Pretty.to_string ns ^ "\nexport = typed_i18n;\nexport as namespace typed_i18n;\n"
-  end)
+  let definitions contents =
+    let methods = List (
+        ("interface TFunction {", ";", "}", list),
+        contents
+      ) in
+    let interface = Atom (Easy_format.Pretty.to_string methods, atom) in
+    let ns = List (
+        ("declare namespace typed_i18n {", "", "}", list),
+        interface::[]
+      ) in
+    Easy_format.Pretty.to_string ns ^ "\nexport = typed_i18n;\nexport as namespace typed_i18n;\n"
+end
+
+let create_translator = function
+  | "flow" -> (module Flow : Translate.Translatable with type t = ty)
+  | "typescript" -> (module Typescript : Translate.Translatable with type t = ty)
+  | _ -> exit 1
 
 let insert_dot k1 k2 =
   if k1 = "" then k2
@@ -109,39 +114,18 @@ let handle_language prefer_lang namespaces json =
 
 let translate ~input_file ~output_dir ~languages (namespace, path_and_values) =
   List.iter languages ~f:(fun lang ->
-      (* FIXME: Those form seems doesn't to use OCaml's HO modules.
-         But I couldn't resolve type error `The type constructor Impl.t would escape its scope` 
-         Caused by codes like below
-         let get_impl = function
-          | "flow" -> flow
-          | "typescript" -> typescript
-         in
-         let impl = get_impl lang in
-         let module Impl = (val impl) in
-         let module M = Translate.Translator (Impl) in
-      *)
-      let module F = Flow in
-      let module T = Typescript in
-      match lang with
-      | "flow" ->
-        path_and_values
-        |> List.map ~f:F.definition
-        |> F.definitions
-        |> (fun content ->
-            let dist = output_dir ^ "/" ^ F.output_filename input_file namespace in
-            Out_channel.write_all dist content;
-            print_endline @@ "Generated in " ^ dist
-          )
-      | "typescript" ->
-        path_and_values
-        |> List.map ~f:T.definition
-        |> T.definitions
-        |> (fun content ->
-            let dist = output_dir ^ "/" ^ T.output_filename input_file namespace in
-            Out_channel.write_all dist content;
-            print_endline @@ "Generated in " ^ dist
-          )
-      | l -> raise @@ Invalid_language (l ^ " is not supported")
+      let impl = create_translator lang in
+      let module Impl = (val impl) in
+      let module M = Translate.Translator (Impl) in
+
+      path_and_values
+      |> List.map ~f:M.definition
+      |> M.definitions
+      |> (fun content ->
+          let dist = output_dir ^ "/" ^ M.output_filename input_file namespace in
+          Out_channel.write_all dist content;
+          print_endline @@ "Generated in " ^ dist
+        )
     ) 
 
 module Cmd : sig

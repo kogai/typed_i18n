@@ -6,14 +6,14 @@ module type Translatable = sig
   val definitions: Easy_format.t list -> string
 end
 
-module Translator (Impl: Translatable) : sig
-  type t = Impl.t
+module Translator (Impl: Translatable) : (sig
+  type t
 
   val format: Yojson.Basic.json -> Easy_format.t
   val definition: t -> Easy_format.t
   val output_filename: string -> string -> string
   val definitions: Easy_format.t list -> string
-end = struct
+end with type t = Impl.t) = struct
   open Core
   open Easy_format
   type t = Impl.t
@@ -21,8 +21,6 @@ end = struct
   exception Unreachable 
   exception Invalid_language_key 
   exception Invalid_extension of string
-
-  let definitions = Impl.definitions
 
   let rec format = function
     | `List [] -> Atom ("[]", atom)
@@ -45,7 +43,7 @@ end = struct
     if is_array array_or_tuple then
       match array_or_tuple with
       | [] -> raise Unreachable
-      | x::_ -> Atom (Easy_format.Pretty.to_string x ^ "[]", atom)
+      | x::_ -> Atom (Pretty.to_string x ^ "[]", atom)
     else
       List (("[", ",", "]", list), array_or_tuple)
   and is_array = function
@@ -57,6 +55,7 @@ end = struct
                |> Tuple2.get2
 
   let definition = Impl.definition format
+  let definitions = Impl.definitions
 
   let output_filename path namespace =
     let filename = Filename.basename path in
