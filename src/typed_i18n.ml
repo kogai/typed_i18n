@@ -10,24 +10,39 @@ module Flow = Translate.Translator (struct
     type t = ty
     let extension = "js.flow"
     let read_only_tag =  Some "+"
-    let string_of_t format {path; value;} =
+    let definition format {path; value;} =
       let fname = "t" in
       let typedef = Easy_format.Pretty.to_string @@ format value in
-      let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
-      result
-    let definition content = "// @flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n"
+      let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";"in
+      Atom (result, atom)
+    let definitions contents =
+      contents
+      |> List.map ~f:Easy_format.Pretty.to_string
+      |> String.concat ~sep:"\n"
+      |> (fun content ->
+          "// @flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n"
+        )
   end)
 
 module Typescript = Translate.Translator (struct
     type t = ty
     let extension = "d.ts"
     let read_only_tag =  Some "readonly "
-    let string_of_t format {path; value;} =
-      let fname = "t" in
+    let definition format {path; value;} =
       let typedef = Easy_format.Pretty.to_string @@ format value in
-      let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
-      result
-    let definition content = "declare namespace typed_i18n {\n" ^ content ^ "\n\nexport type TFunction = typeof t\n}"
+      Atom ("(_: \""^ path ^ "\"): " ^ typedef, atom)
+
+    let definitions contents =
+      let methods = List (
+          ("interface TFunction {", ";", "}", list),
+          contents
+        ) in
+      let interface = Atom (Easy_format.Pretty.to_string methods, atom) in
+      let ns = List (
+          ("declare namespace typed_i18n {", "", "}", list),
+          interface::[]
+        ) in
+      Easy_format.Pretty.to_string ns ^ "\nexport = typed_i18n;\nexport as namespace typed_i18n;\n"
   end)
 
 let insert_dot k1 k2 =
@@ -110,9 +125,8 @@ let translate ~input_file ~output_dir ~languages (namespace, path_and_values) =
       match lang with
       | "flow" ->
         path_and_values
-        |> List.map ~f:F.string_of_t
-        |> String.concat ~sep:"\n"
-        |> F.definition
+        |> List.map ~f:F.definition
+        |> F.definitions
         |> (fun content ->
             let dist = output_dir ^ "/" ^ F.output_filename input_file namespace in
             Out_channel.write_all dist content;
@@ -120,9 +134,8 @@ let translate ~input_file ~output_dir ~languages (namespace, path_and_values) =
           )
       | "typescript" ->
         path_and_values
-        |> List.map ~f:T.string_of_t
-        |> String.concat ~sep:"\n"
-        |> T.definition
+        |> List.map ~f:T.definition
+        |> T.definitions
         |> (fun content ->
             let dist = output_dir ^ "/" ^ T.output_filename input_file namespace in
             Out_channel.write_all dist content;

@@ -2,17 +2,17 @@ module type Translatable = sig
   type t
   val extension: string
   val read_only_tag: string option
-  val string_of_t: (Yojson.Basic.json -> Easy_format.t) -> t -> string
-  val definition: string -> string
+  val definition: (Yojson.Basic.json -> Easy_format.t) -> t -> Easy_format.t
+  val definitions: Easy_format.t list -> string
 end
 
 module Translator (Impl: Translatable) : sig
   type t = Impl.t
 
   val format: Yojson.Basic.json -> Easy_format.t
-  val string_of_t: t -> string
+  val definition: t -> Easy_format.t
   val output_filename: string -> string -> string
-  val definition: string -> string
+  val definitions: Easy_format.t list -> string
 end = struct
   open Core
   open Easy_format
@@ -22,7 +22,7 @@ end = struct
   exception Invalid_language_key 
   exception Invalid_extension of string
 
-  let definition = Impl.definition
+  let definitions = Impl.definitions
 
   let rec format = function
     | `List [] -> Atom ("[]", atom)
@@ -56,7 +56,7 @@ end = struct
                  ~f:(fun (before, is_array') next -> (next, is_array' && before = next))
                |> Tuple2.get2
 
-  let string_of_t = Impl.string_of_t format
+  let definition = Impl.definition format
 
   let output_filename path namespace =
     let filename = Filename.basename path in
