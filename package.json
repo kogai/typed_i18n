@@ -1,6 +1,6 @@
 {
   "name": "@kogai/typed_i18n",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "",
   "bin": "index.js",
   "scripts": {
