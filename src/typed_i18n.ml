@@ -205,9 +205,9 @@ end = struct
     | Translate.Invalid_extension Some ext -> Logger.log `Error "Invalid extension, [%s] isn't supported\n" ext
     | Translate.Invalid_extension None -> Logger.log `Error "Extention doesn't existed\n"
     | Yojson.Json_error err -> Logger.log `Error "Invalid JSON \n%s\n" err
-    | _ ->
+    | e ->
       Logger.log `Error "Unhandled error occured\n";
-      raise Unreachable
+      raise e
 
   let term = Term.(const run $ input $ output $ prefer $ namespaces $ languages)
 end
