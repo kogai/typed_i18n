@@ -97,7 +97,7 @@ let handle_language prefer_lang namespaces json =
 module Cmd : sig
   val name: string
   val version: string
-  val run: string -> string -> string -> string list -> unit
+  val run: string -> string -> string -> string list -> string list -> unit
   val term: unit Cmdliner.Term.t
 end = struct
   open Cmdliner
@@ -134,8 +134,12 @@ end = struct
     let doc = "List of namespace declared in locale file" in
     Arg.(value & opt_all string ["translation"] & info ["n"; "namespaces"] ~docv:"NAMESPACES" ~doc)
 
-  let run input output prefer namespaces =
-    input
+  let languages =
+    let doc = "Destination language like flow or typescript" in
+    Arg.(value & opt_all string ["flow"] & info ["l"; "languages"] ~docv:"LANGUAGES" ~doc)
+
+  let run input_file output_dir prefer namespaces languages =
+    input_file
     |> Yojson.Basic.from_file
     |> handle_language prefer namespaces
     |> List.iter ~f:(fun (namespace, path_and_values) ->
@@ -144,13 +148,13 @@ end = struct
         |> String.concat ~sep:"\n"
         |> Flow_type.definition
         |> (fun content ->
-            let dist = output ^ "/" ^ Flow_type.output_filename input namespace in
+            let dist = output_dir ^ "/" ^ Flow_type.output_filename input_file namespace in
             Out_channel.write_all dist content;
             print_endline @@ "Generated in " ^ dist
           )
       )
 
-  let term = Term.(const run $ input $ output $ prefer $ namespaces)
+  let term = Term.(const run $ input $ output $ prefer $ namespaces $ languages)
 end
 
 let () =
