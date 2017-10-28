@@ -92,6 +92,17 @@ let handle_language prefer_lang namespaces json =
                         ))
       | _ -> raise Unreachable)
 
+let translate ~input_file ~output_dir (namespace, path_and_values) =
+  path_and_values
+  |> List.map ~f:Flow_type.string_of_t
+  |> String.concat ~sep:"\n"
+  |> Flow_type.definition
+  |> (fun content ->
+      let dist = output_dir ^ "/" ^ Flow_type.output_filename input_file namespace in
+      Out_channel.write_all dist content;
+      print_endline @@ "Generated in " ^ dist
+    )
+
 module Cmd : sig
   val name: string
   val version: string
@@ -140,17 +151,7 @@ end = struct
     input_file
     |> Yojson.Basic.from_file
     |> handle_language prefer namespaces
-    |> List.iter ~f:(fun (namespace, path_and_values) ->
-        path_and_values
-        |> List.map ~f:Flow_type.string_of_t
-        |> String.concat ~sep:"\n"
-        |> Flow_type.definition
-        |> (fun content ->
-            let dist = output_dir ^ "/" ^ Flow_type.output_filename input_file namespace in
-            Out_channel.write_all dist content;
-            print_endline @@ "Generated in " ^ dist
-          )
-      )
+    |> List.iter ~f:(translate ~input_file ~output_dir)
 
   let term = Term.(const run $ input $ output $ prefer $ namespaces $ languages)
 end
