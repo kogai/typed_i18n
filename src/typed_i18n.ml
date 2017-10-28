@@ -59,6 +59,18 @@ let rec walk ?(path = "") = Yojson.Basic.(function
 
 exception Unreachable
 exception Invalid_namespace_key 
+exception Invalid_language_key 
+exception Invalid_language of string
+
+let check_compatibility  = function
+  | [] -> raise Invalid_language_key
+  | ((primary_language, primary_json)::rest_languages) ->
+    List.iter
+      ~f:(fun (other_lang, other_json) -> 
+          if primary_json <> other_json then
+            print_endline @@ "Warning: [" ^ primary_language ^ "] and [" ^ other_lang ^ "] are not compatible"
+        )
+      rest_languages
 
 let handle_language prefer_lang namespaces json =
   let rec gather_langs = Yojson.Basic.(function
@@ -68,7 +80,7 @@ let handle_language prefer_lang namespaces json =
     )
   in
   let languages = gather_langs json in
-  Flow_type.check_compatibility languages;
+  check_compatibility languages;
 
   languages
   |> List.find ~f:(fun (l, _) -> l = prefer_lang)

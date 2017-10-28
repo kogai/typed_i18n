@@ -10,7 +10,6 @@ module Translator (Impl: Translatable) : sig
   type t = Impl.t
 
   val format: Yojson.Basic.json -> Easy_format.t
-  val check_compatibility: (string * Yojson.Basic.json) list -> unit
   val string_of_t: t -> string
   val output_filename: string -> string -> string
   val definition: string -> string
@@ -56,16 +55,6 @@ end = struct
                  ~init:(x, true)
                  ~f:(fun (before, is_array') next -> (next, is_array' && before = next))
                |> Tuple2.get2
-
-  let check_compatibility  = function
-    | [] -> raise Invalid_language_key
-    | ((primary_language, primary_json)::rest_languages) ->
-      List.iter
-        ~f:(fun (other_lang, other_json) -> 
-            if format primary_json <> format other_json then
-              print_endline @@ "Warning: [" ^ primary_language ^ "] and [" ^ other_lang ^ "] are not compatible"
-          )
-        rest_languages
 
   let string_of_t = Impl.string_of_t format
 
