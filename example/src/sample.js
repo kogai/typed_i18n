@@ -1,10 +1,10 @@
 // @flow
+
 import type {
   TFunction
 } from './locale.translation';
 
-declare
-var t: TFunction;
+declare var t: TFunction;
 
 // $ExpectError
 const x = t("invalid.string")
