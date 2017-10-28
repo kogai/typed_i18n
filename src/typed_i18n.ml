@@ -94,22 +94,41 @@ let handle_language prefer_lang namespaces json =
 
 let translate ~input_file ~output_dir ~languages (namespace, path_and_values) =
   List.iter languages ~f:(fun lang ->
-      (* let M = match lang with
-         | "flow" -> Flow
-         | "typescript" -> Typescript
-         | l -> raise @@ Invalid_language (l ^ " is not supported")
-         in *)
-      let module M = Typescript in
-
-      path_and_values
-      |> List.map ~f:M.string_of_t
-      |> String.concat ~sep:"\n"
-      |> M.definition
-      |> (fun content ->
-          let dist = output_dir ^ "/" ^ M.output_filename input_file namespace in
-          Out_channel.write_all dist content;
-          print_endline @@ "Generated in " ^ dist
-        )
+      (* FIXME: Those form seems doesn't to use OCaml's HO modules.
+         But I couldn't resolve type error `The type constructor Impl.t would escape its scope` 
+         Caused by codes like below
+         let get_impl = function
+          | "flow" -> flow
+          | "typescript" -> typescript
+         in
+         let impl = get_impl lang in
+         let module Impl = (val impl) in
+         let module M = Translate.Translator (Impl) in
+      *)
+      let module F = Flow in
+      let module T = Typescript in
+      match lang with
+      | "flow" ->
+        path_and_values
+        |> List.map ~f:F.string_of_t
+        |> String.concat ~sep:"\n"
+        |> F.definition
+        |> (fun content ->
+            let dist = output_dir ^ "/" ^ F.output_filename input_file namespace in
+            Out_channel.write_all dist content;
+            print_endline @@ "Generated in " ^ dist
+          )
+      | "typescript" ->
+        path_and_values
+        |> List.map ~f:T.string_of_t
+        |> String.concat ~sep:"\n"
+        |> T.definition
+        |> (fun content ->
+            let dist = output_dir ^ "/" ^ T.output_filename input_file namespace in
+            Out_channel.write_all dist content;
+            print_endline @@ "Generated in " ^ dist
+          )
+      | l -> raise @@ Invalid_language (l ^ " is not supported")
     ) 
 
 module Cmd : sig

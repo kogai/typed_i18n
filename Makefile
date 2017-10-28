@@ -8,7 +8,7 @@ SRC_DIRS := "src"
 OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS)
 OCB := ocamlbuild $(OCB_FLAGS)
 OPAM_VER := 4.03.0
-ARGS := -i fixture/locale.json -o fixture -p ja
+ARGS := -i fixture/locale.json -o fixture -p ja -l flow -l typescript
 OS := $(shell uname -s)
 
 all:$(NAME).native $(NAME).byte bin/$(NAME).$(OS)
