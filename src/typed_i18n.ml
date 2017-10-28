@@ -6,6 +6,11 @@ type ty = {
   value: Yojson.Basic.json;
 }
 
+exception Unreachable
+exception Invalid_namespace_key of string
+exception Invalid_language_key of string option
+exception Invalid_target_language of string
+
 module Flow = struct
   type t = ty
   let extension = "js.flow"
@@ -75,13 +80,8 @@ let rec walk ?(path = "") = Yojson.Basic.(function
     | value -> [{ path; value; }]
   )
 
-exception Unreachable
-exception Invalid_namespace_key 
-exception Invalid_language_key 
-exception Invalid_language of string
-
 let check_compatibility  = function
-  | [] -> raise Invalid_language_key
+  | [] -> raise @@ Invalid_language_key None
   | ((primary_language, primary_json)::rest_languages) ->
     List.iter
       ~f:(fun (other_lang, other_json) -> 
@@ -107,7 +107,7 @@ let handle_language prefer_lang namespaces json =
         Yojson.Basic.(namespaces
                       |> List.map ~f:(fun name ->
                           (match Util.member name json with
-                           | `Null -> raise Invalid_namespace_key
+                           | `Null -> raise @@ Invalid_namespace_key name
                            | json -> name, (walk json))
                         ))
       | _ -> raise Unreachable)

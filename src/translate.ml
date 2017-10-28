@@ -19,8 +19,7 @@ end with type t = Impl.t) = struct
   type t = Impl.t
 
   exception Unreachable 
-  exception Invalid_language_key 
-  exception Invalid_extension of string
+  exception Invalid_extension of string option
 
   let rec format = function
     | `List [] -> Atom ("[]", atom)
@@ -61,6 +60,6 @@ end with type t = Impl.t) = struct
     let filename = Filename.basename path in
     match Filename.split_extension filename with 
     | filename, Some ("json") -> filename ^ "." ^ namespace ^ "." ^ Impl.extension 
-    | _, Some x -> raise @@ Invalid_extension (x ^ " is invalid extension")
-    | _ -> raise @@ Invalid_extension "has not extension"
+    | _, Some x -> raise @@ Invalid_extension (Some x)
+    | _ -> raise @@ Invalid_extension None
 end
