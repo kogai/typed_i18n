@@ -1,6 +1,6 @@
 NAME := typed_i18n
 TEST_NAME := $(NAME)_test
-PKGS := core,yojson,cmdliner,easy-format,ppx_blob
+PKGS := core,yojson,cmdliner,easy-format,ppx_blob,textutils
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_FILES += package.json
 SRC_DIRS := "src"
@@ -85,6 +85,7 @@ install:
 		yojson \
 		easy-format \
 		cmdliner \
+		textutils \
 		ppx_blob
 
 .PHONY: setup

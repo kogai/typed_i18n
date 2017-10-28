@@ -1,5 +1,6 @@
 open Core
 open Easy_format
+open Textutils.Std
 
 type ty = {
   path: string;
@@ -53,7 +54,7 @@ end
 let create_translator = function
   | "flow" -> (module Flow : Translate.Translatable with type t = ty)
   | "typescript" -> (module Typescript : Translate.Translatable with type t = ty)
-  | _ -> exit 1
+  | lang -> raise @@ Invalid_target_language lang
 
 let insert_dot k1 k2 =
   if k1 = "" then k2
@@ -80,13 +81,30 @@ let rec walk ?(path = "") = Yojson.Basic.(function
     | value -> [{ path; value; }]
   )
 
+module Logger : sig
+  type t = [`Warn | `Error | `Info]
+
+  val log: t -> ('a, Out_channel.t, unit) format -> 'a
+end = struct
+  open Console
+  type t = [`Warn | `Error | `Info]
+
+  let log level =
+    (match level with
+     | `Warn -> Ansi.printf [`Yellow] "[WARN]: "
+     | `Error -> Ansi.printf [`Red] "[ERROR]: "
+     | `Info -> Ansi.printf [`Cyan] "[INFO]: "
+    );
+    Console.Ansi.printf [`White]
+end
+
 let check_compatibility  = function
   | [] -> raise @@ Invalid_language_key None
   | ((primary_language, primary_json)::rest_languages) ->
     List.iter
       ~f:(fun (other_lang, other_json) -> 
-          if primary_json <> other_json then
-            print_endline @@ "Warning: [" ^ primary_language ^ "] and [" ^ other_lang ^ "] are not compatible"
+          if primary_json <> other_json then 
+            Logger.log `Warn "[%s] and [%s] are not compatible\n" primary_language other_lang
         )
       rest_languages
 
@@ -124,7 +142,7 @@ let translate ~input_file ~output_dir ~languages (namespace, path_and_values) =
       |> (fun content ->
           let dist = output_dir ^ "/" ^ M.output_filename input_file namespace in
           Out_channel.write_all dist content;
-          print_endline @@ "Generated in " ^ dist
+          Logger.log `Info "Generated %s\n" dist
         )
     ) 
 
@@ -173,10 +191,23 @@ end = struct
     Arg.(value & opt_all string ["flow"] & info ["l"; "languages"] ~docv:"LANGUAGES" ~doc)
 
   let run input_file output_dir prefer namespaces languages =
-    input_file
-    |> Yojson.Basic.from_file
-    |> handle_language prefer namespaces
-    |> List.iter ~f:(translate ~input_file ~output_dir ~languages)
+    let open Console in
+    try
+      input_file
+      |> Yojson.Basic.from_file
+      |> handle_language prefer namespaces
+      |> List.iter ~f:(translate ~input_file ~output_dir ~languages)
+    with
+    | Invalid_namespace_key key -> Logger.log `Error "Invalid namespace [%s] designated\n" key
+    | Invalid_language_key None -> Logger.log `Error "Language key isn't existed\n"
+    | Invalid_language_key Some lang -> Logger.log `Error "Invalid language, [%s] isn't supported\n" lang
+    | Invalid_target_language lang -> Logger.log `Error "Invalid target, [%s] isn't supported\n" lang
+    | Translate.Invalid_extension Some ext -> Logger.log `Error "Invalid extension, [%s] isn't supported\n" ext
+    | Translate.Invalid_extension None -> Logger.log `Error "Extention doesn't existed\n"
+    | Yojson.Json_error err -> Logger.log `Error "Invalid JSON \n%s\n" err
+    | _ ->
+      Logger.log `Error "Unhandled error occured\n";
+      raise Unreachable
 
   let term = Term.(const run $ input $ output $ prefer $ namespaces $ languages)
 end

@@ -1,3 +1,6 @@
+exception Unreachable 
+exception Invalid_extension of string option
+
 module type Translatable = sig
   type t
   val extension: string
@@ -17,9 +20,6 @@ end with type t = Impl.t) = struct
   open Core
   open Easy_format
   type t = Impl.t
-
-  exception Unreachable 
-  exception Invalid_extension of string option
 
   let rec format = function
     | `List [] -> Atom ("[]", atom)

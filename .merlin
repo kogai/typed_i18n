@@ -2,4 +2,4 @@ S src/**
 
 B _build/**
 
-PKG ounit core yojson cmdliner easy-format ppx_blob
+PKG ounit core yojson cmdliner easy-format ppx_blob textutils
