@@ -60,8 +60,9 @@ test-byte: $(TEST_NAME).byte
 	@./$(TEST_NAME).byte
 
 .PHONY: test-ci
-test-ci: install
-	make test
+test-ci:
+	cd example && \
+	yarn test
 
 .PHONY: publish
 publish: clean

@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "typed_i18n -i ./src/locale.json -o ./src -p ja",
-    "type": "yarn build && flow",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "../index.js -i ./src/locale.json -o ./src -p ja -l flow -l typescript",
+    "test": "yarn build && flow"
   },
   "keywords": [],
   "author": "",
