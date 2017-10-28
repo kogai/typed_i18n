@@ -1,17 +1,16 @@
 open Core
 open Easy_format
 
-type t = {
+type ty = {
   path: string;
   value: Yojson.Basic.json;
 }
 
 module Flow_type = Translate.Translator (struct
-    type t = string * Yojson.Basic.json
-
+    type t = ty
     let extension = "js.flow"
     let read_only_tag =  Some "+"
-    let string_of_t format (path, value) =
+    let string_of_t format {path; value;} =
       let fname = "t" in
       let typedef = Easy_format.Pretty.to_string @@ format value in
       let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
@@ -20,11 +19,10 @@ module Flow_type = Translate.Translator (struct
   end)
 
 module Type_script = Translate.Translator (struct
-    type t = string * Yojson.Basic.json
-
+    type t = ty
     let extension = "d.ts"
     let read_only_tag =  Some "readonly "
-    let string_of_t format (path, value) =
+    let string_of_t format {path; value;} =
       let fname = "t" in
       let typedef = Easy_format.Pretty.to_string @@ format value in
       let result = "function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
@@ -144,7 +142,7 @@ end = struct
     |> handle_language prefer namespaces
     |> List.iter ~f:(fun (namespace, path_and_values) ->
         path_and_values
-        |> List.map ~f:(fun { path; value; } -> Flow_type.string_of_t (path, value))
+        |> List.map ~f:Flow_type.string_of_t
         |> String.concat ~sep:"\n"
         |> Flow_type.definition
         |> (fun content ->
