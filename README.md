@@ -42,8 +42,12 @@ import type { TFunction } from './locale.translation'; // Definition file genera
 
 declare var t: TFunction;
 
-// It is ok
-const x = t("foo")
+// Those are ok
+const x: { bar: string, buzz: number } = t("foo")
+const x1: string = x.bar;
+const x2: number = x.buzz;
+// Expect error
+const x3 = x.buzzz;
 
 // Expect error
 const y = t("fooo")
@@ -51,8 +55,6 @@ const y = t("fooo")
 // Those are also strictly typed too
 const z1: string = t("foo.bar");
 const z2: number = t("foo.buzz");
-const z3: string = x.bar;
-const z4: number = x.buzz;
 ```
 
 ### Usage

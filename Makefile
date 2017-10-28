@@ -70,7 +70,8 @@ publish: clean
 	make && \
 	make docker && \
 	git commit -a -m "bump binary" && \
-	npm publish --access public
+	npm publish --access public && \
+	git push
 
 .PHONY: install
 install:
