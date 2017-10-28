@@ -6,7 +6,7 @@ type ty = {
   value: Yojson.Basic.json;
 }
 
-module Flow_type = Translate.Translator (struct
+module Flow = Translate.Translator (struct
     type t = ty
     let extension = "js.flow"
     let read_only_tag =  Some "+"
@@ -18,16 +18,16 @@ module Flow_type = Translate.Translator (struct
     let definition content = "// @flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n"
   end)
 
-module Type_script = Translate.Translator (struct
+module Typescript = Translate.Translator (struct
     type t = ty
     let extension = "d.ts"
     let read_only_tag =  Some "readonly "
     let string_of_t format {path; value;} =
       let fname = "t" in
       let typedef = Easy_format.Pretty.to_string @@ format value in
-      let result = "function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
+      let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";" in
       result
-    let definition content = content ^ "\n\nexport type TFunction = typeof t\n"
+    let definition content = "declare namespace typed_i18n {\n" ^ content ^ "\n\nexport type TFunction = typeof t\n}"
   end)
 
 let insert_dot k1 k2 =
@@ -92,16 +92,25 @@ let handle_language prefer_lang namespaces json =
                         ))
       | _ -> raise Unreachable)
 
-let translate ~input_file ~output_dir (namespace, path_and_values) =
-  path_and_values
-  |> List.map ~f:Flow_type.string_of_t
-  |> String.concat ~sep:"\n"
-  |> Flow_type.definition
-  |> (fun content ->
-      let dist = output_dir ^ "/" ^ Flow_type.output_filename input_file namespace in
-      Out_channel.write_all dist content;
-      print_endline @@ "Generated in " ^ dist
-    )
+let translate ~input_file ~output_dir ~languages (namespace, path_and_values) =
+  List.iter languages ~f:(fun lang ->
+      (* let M = match lang with
+         | "flow" -> Flow
+         | "typescript" -> Typescript
+         | l -> raise @@ Invalid_language (l ^ " is not supported")
+         in *)
+      let module M = Typescript in
+
+      path_and_values
+      |> List.map ~f:M.string_of_t
+      |> String.concat ~sep:"\n"
+      |> M.definition
+      |> (fun content ->
+          let dist = output_dir ^ "/" ^ M.output_filename input_file namespace in
+          Out_channel.write_all dist content;
+          print_endline @@ "Generated in " ^ dist
+        )
+    ) 
 
 module Cmd : sig
   val name: string
@@ -151,7 +160,7 @@ end = struct
     input_file
     |> Yojson.Basic.from_file
     |> handle_language prefer namespaces
-    |> List.iter ~f:(translate ~input_file ~output_dir)
+    |> List.iter ~f:(translate ~input_file ~output_dir ~languages)
 
   let term = Term.(const run $ input $ output $ prefer $ namespaces $ languages)
 end
