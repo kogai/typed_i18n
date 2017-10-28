@@ -1,0 +1,16 @@
+version: '2'
+services:
+  datastore:
+    container_name: opamstore
+    image: busybox
+    volumes:
+      - opam_install:$HOME/.opam
+  compiler:
+    container_name: ocamlbuild
+    build:
+      context: .
+    volumes_from:
+      - datastore
+volumes:
+  opam_install:
+    driver: local
