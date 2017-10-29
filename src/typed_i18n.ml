@@ -98,13 +98,70 @@ end = struct
     Console.Ansi.printf [`White]
 end
 
+module Compatible : sig
+  open Yojson.Basic
+  val find: json -> string -> json
+  val correct: json -> json -> string list
+  val check: json -> json -> unit
+end = struct
+  open Yojson.Basic
+  open Yojson.Basic.Util
+
+  let rec find tree key =
+    (* printf "key %s -> %s\n" key (pretty_to_string tree); *)
+    match String.split ~on:'.' key with
+    | [] -> raise Unreachable
+    | ""::[] ->
+      print_endline "Maybe unreachable";
+      member key tree
+    | k::[] ->
+      let r = Str.regexp "^\[\([0-9]\)\]$" in
+      if Str.string_match r k 0 then (
+        let idx = Str.matched_group 1 k in
+        index (int_of_string idx) tree
+      ) else
+        member key tree
+    | k::ks -> find (member k tree) (String.concat ~sep:"." ks)
+
+  let type_of_json json =
+    ()
+
+  let correct primary secondary =
+    let impl = create_translator "flow" in
+    let module Impl = (val impl) in
+    let module M = Translate.Translator (Impl) in
+    let type_of_json json = json
+                            |> M.format
+                            |> Easy_format.Pretty.to_string
+    in
+
+    primary
+    |> walk
+    |> List.map ~f:(fun { path; value; } ->
+        let is_match =
+          try
+            (type_of_json (find secondary path) = type_of_json value)
+          with
+          | Yojson.Basic.Util.Type_error _ -> false
+        in
+        path, is_match)
+    |> List.filter ~f:(fun (_, is_match) -> not is_match)
+    |> List.map ~f:Tuple2.get1
+
+  let check primary secondary =
+    correct primary secondary
+    |> List.iter ~f:(fun path -> Logger.log `Warn "[%s] isn't compatible\n" path)
+end
+
 let check_compatibility  = function
   | [] -> raise @@ Invalid_language_key None
   | ((primary_language, primary_json)::rest_languages) ->
     List.iter
       ~f:(fun (other_lang, other_json) -> 
-          if primary_json <> other_json then 
-            Logger.log `Warn "[%s] and [%s] are not compatible\n" primary_language other_lang
+          if primary_json <> other_json then (
+            Logger.log `Warn "[%s] and [%s] are not compatible\n" primary_language other_lang;
+            Compatible.check primary_json other_json;
+          )
         )
       rest_languages
 
