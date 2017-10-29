@@ -115,7 +115,7 @@ end = struct
       print_endline "Maybe unreachable";
       member key tree
     | k::[] ->
-      let r = Str.regexp "^\[\([0-9]\)\]$" in
+      let r = Str.regexp "^\\[\\([0-9]\\)\\]$" in
       if Str.string_match r k 0 then (
         let idx = Str.matched_group 1 k in
         index (int_of_string idx) tree
