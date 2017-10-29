@@ -53,5 +53,16 @@
         "body_copies"
       ]
     }
+  },
+  "zh": {
+    "translation": {
+      "title": "标题",
+      "support_tuple": [
+        "这是",
+        "一句话",
+        100,
+        null
+      ]
+    }
   }
 }
