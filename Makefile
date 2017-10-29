@@ -1,6 +1,6 @@
 NAME := typed_i18n
 TEST_NAME := $(NAME)_test
-PKGS := core,yojson,cmdliner,easy-format,ppx_blob,textutils
+PKGS := core,yojson,cmdliner,easy-format,ppx_blob,textutils,str
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_FILES += package.json
 SRC_DIRS := "src"

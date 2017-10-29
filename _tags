@@ -1,2 +1,2 @@
 true: annot, thread
-<src/*>: package(ppx_blob)
+<src/*.ml>: package(ppx_blob)
