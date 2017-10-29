@@ -102,7 +102,7 @@ module Compatible : sig
   open Yojson.Basic
   val find: json -> string -> json
   val correct: json -> json -> string list
-  val check: json -> json -> unit
+  val check: string * json -> string * json -> unit
 end = struct
   open Yojson.Basic
   open Yojson.Basic.Util
@@ -148,22 +148,24 @@ end = struct
     |> List.filter ~f:(fun (_, is_match) -> not is_match)
     |> List.map ~f:Tuple2.get1
 
-  let check primary secondary =
-    correct primary secondary
+  let check (p_lang, p_json) (s_lang, s_json) =
+    correct p_json s_json
+    |> (fun errors ->
+        (if List.length errors > 0 then
+           Logger.log `Warn "[%s] and [%s] are not compatible\n" p_lang s_lang;
+        );
+        errors)
     |> List.iter ~f:(fun path -> Logger.log `Warn "[%s] isn't compatible\n" path)
 end
 
 let check_compatibility  = function
   | [] -> raise @@ Invalid_language_key None
-  | ((primary_language, primary_json)::rest_languages) ->
+  | ((primary_lang, primary_json)::rest_langs) ->
     List.iter
       ~f:(fun (other_lang, other_json) -> 
-          if primary_json <> other_json then (
-            Logger.log `Warn "[%s] and [%s] are not compatible\n" primary_language other_lang;
-            Compatible.check primary_json other_json;
-          )
+          Compatible.check (primary_lang, primary_json) (other_lang, other_json);
         )
-      rest_languages
+      rest_langs
 
 let handle_language prefer_lang namespaces json =
   let rec gather_langs = Yojson.Basic.(function
