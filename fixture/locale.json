@@ -41,7 +41,11 @@
         "first_name": "花子",
         "familly_name": "田中"
       }],
-      "array_of_empty_object": [{}]
+      "array_of_empty_object": [{}],
+      "allow-comupted-properties": {
+        "0": "数値",
+        "foo-bar": true
+      }
     }
   },
   "en": {

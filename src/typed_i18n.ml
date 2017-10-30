@@ -48,7 +48,7 @@ module Typescript = struct
         ("declare namespace typed_i18n {", "", "}", list),
         interface::[]
       ) in
-    Easy_format.Pretty.to_string ns ^ "\nexport = typed_i18n;\nexport as namespace typed_i18n;\n"
+    Easy_format.Pretty.to_string ns ^ "\nexport = typed_i18n;\n"
 end
 
 let create_translator = function
@@ -108,7 +108,6 @@ end = struct
   open Yojson.Basic.Util
 
   let rec find tree key =
-    (* printf "key %s -> %s\n" key (pretty_to_string tree); *)
     match String.split ~on:'.' key with
     | [] -> raise Unreachable
     | ""::[] ->
@@ -122,9 +121,6 @@ end = struct
       ) else
         member key tree
     | k::ks -> find (member k tree) (String.concat ~sep:"." ks)
-
-  let type_of_json json =
-    ()
 
   let correct primary secondary =
     let impl = create_translator "flow" in

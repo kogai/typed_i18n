@@ -36,7 +36,8 @@ end with type t = Impl.t) = struct
     | `Null -> Atom ("null", atom)
   and format_field (key, value) =
     let read_only_tag = Option.value Impl.read_only_tag ~default:"" in
-    Label ((Atom (read_only_tag ^ key ^ ":", atom), label), format value)
+    let prop = sprintf "%s\"%s\":" read_only_tag key in
+    Label ((Atom (prop, atom), label), format value)
   and format_list xs =
     let array_or_tuple = List.map ~f:format xs in
     if is_array array_or_tuple then
