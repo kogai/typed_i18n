@@ -10,9 +10,11 @@ It generate from
 ```json
 {
   "translation": {
-    "foo": {
-      "bar": "some text",
-      "buzz": 999
+    "en": {
+      "foo": {
+        "bar": "some text",
+        "buzz": 999
+      }
     }
   }
 }
@@ -47,7 +49,6 @@ declare namespace typed_i18n {
   }
 }
 export = typed_i18n;
-export as namespace typed_i18n;
 ```
 
 then if you use TFunction like below, type-checker warn you function call by invalid path
