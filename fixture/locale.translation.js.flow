@@ -1,36 +1,36 @@
 // @flow
 
-declare function t(_: "title"): string;
-declare function t(_: "body_copies"): string[];
-declare function t(_: "body_copies.[0]"): string;
-declare function t(_: "body_copies.[1]"): string;
-declare function t(_: "body_copies.[2]"): string;
-declare function t(_: "support_tuple"): [ string, number, boolean ];
-declare function t(_: "support_tuple.[0]"): string;
-declare function t(_: "support_tuple.[1]"): number;
-declare function t(_: "support_tuple.[2]"): boolean;
-declare function t(_: "array_of_array"): number[][];
-declare function t(_: "array_of_array.[0]"): number[];
-declare function t(_: "array_of_array.[0].[0]"): number;
-declare function t(_: "array_of_array.[0].[1]"): number;
-declare function t(_: "array_of_array.[1]"): number[];
-declare function t(_: "array_of_array.[1].[0]"): number;
-declare function t(_: "array_of_array.[1].[1]"): number;
-declare function t(_: "tuple_of_tuple"): [
+declare function t(_: "title", _?: {}): string;
+declare function t(_: "body_copies", _?: {}): string[];
+declare function t(_: "body_copies.[0]", _?: {}): string;
+declare function t(_: "body_copies.[1]", _?: {}): string;
+declare function t(_: "body_copies.[2]", _?: {}): string;
+declare function t(_: "support_tuple", _?: {}): [ string, number, boolean ];
+declare function t(_: "support_tuple.[0]", _?: {}): string;
+declare function t(_: "support_tuple.[1]", _?: {}): number;
+declare function t(_: "support_tuple.[2]", _?: {}): boolean;
+declare function t(_: "array_of_array", _?: {}): number[][];
+declare function t(_: "array_of_array.[0]", _?: {}): number[];
+declare function t(_: "array_of_array.[0].[0]", _?: {}): number;
+declare function t(_: "array_of_array.[0].[1]", _?: {}): number;
+declare function t(_: "array_of_array.[1]", _?: {}): number[];
+declare function t(_: "array_of_array.[1].[0]", _?: {}): number;
+declare function t(_: "array_of_array.[1].[1]", _?: {}): number;
+declare function t(_: "tuple_of_tuple", _?: {}): [
   [ string, boolean, { +"foo": string, +"bar": null } ],
   [ string, boolean, number ]
 ];
-declare function t(_: "tuple_of_tuple.[0]"): [ string, boolean, { +"foo": string, +"bar": null } ];
-declare function t(_: "tuple_of_tuple.[0].[0]"): string;
-declare function t(_: "tuple_of_tuple.[0].[1]"): boolean;
-declare function t(_: "tuple_of_tuple.[0].[2]"): { +"foo": string, +"bar": null };
-declare function t(_: "tuple_of_tuple.[0].[2].foo"): string;
-declare function t(_: "tuple_of_tuple.[0].[2].bar"): null;
-declare function t(_: "tuple_of_tuple.[1]"): [ string, boolean, number ];
-declare function t(_: "tuple_of_tuple.[1].[0]"): string;
-declare function t(_: "tuple_of_tuple.[1].[1]"): boolean;
-declare function t(_: "tuple_of_tuple.[1].[2]"): number;
-declare function t(_: "child"): {
+declare function t(_: "tuple_of_tuple.[0]", _?: {}): [ string, boolean, { +"foo": string, +"bar": null } ];
+declare function t(_: "tuple_of_tuple.[0].[0]", _?: {}): string;
+declare function t(_: "tuple_of_tuple.[0].[1]", _?: {}): boolean;
+declare function t(_: "tuple_of_tuple.[0].[2]", _?: {}): { +"foo": string, +"bar": null };
+declare function t(_: "tuple_of_tuple.[0].[2].foo", _?: {}): string;
+declare function t(_: "tuple_of_tuple.[0].[2].bar", _?: {}): null;
+declare function t(_: "tuple_of_tuple.[1]", _?: {}): [ string, boolean, number ];
+declare function t(_: "tuple_of_tuple.[1].[0]", _?: {}): string;
+declare function t(_: "tuple_of_tuple.[1].[1]", _?: {}): boolean;
+declare function t(_: "tuple_of_tuple.[1].[2]", _?: {}): number;
+declare function t(_: "child", _?: {}): {
   +"title_of_child": string,
   +"variable_types": {
     +"key_of_int": number,
@@ -39,28 +39,28 @@ declare function t(_: "child"): {
     +"key_of_null": null
   }
 };
-declare function t(_: "child.title_of_child"): string;
-declare function t(_: "child.variable_types"): {
+declare function t(_: "child.title_of_child", _?: {}): string;
+declare function t(_: "child.variable_types", _?: {}): {
   +"key_of_int": number,
   +"key_of_float": number,
   +"key_of_boolean": boolean,
   +"key_of_null": null
 };
-declare function t(_: "child.variable_types.key_of_int"): number;
-declare function t(_: "child.variable_types.key_of_float"): number;
-declare function t(_: "child.variable_types.key_of_boolean"): boolean;
-declare function t(_: "child.variable_types.key_of_null"): null;
-declare function t(_: "children"): { +"first_name": string, +"familly_name": string }[];
-declare function t(_: "children.[0]"): { +"first_name": string, +"familly_name": string };
-declare function t(_: "children.[0].first_name"): string;
-declare function t(_: "children.[0].familly_name"): string;
-declare function t(_: "children.[1]"): { +"first_name": string, +"familly_name": string };
-declare function t(_: "children.[1].first_name"): string;
-declare function t(_: "children.[1].familly_name"): string;
-declare function t(_: "array_of_empty_object"): {}[];
-declare function t(_: "array_of_empty_object.[0]"): {};
-declare function t(_: "allow-comupted-properties"): { +"0": string, +"foo-bar": boolean };
-declare function t(_: "allow-comupted-properties.0"): string;
-declare function t(_: "allow-comupted-properties.foo-bar"): boolean;
+declare function t(_: "child.variable_types.key_of_int", _?: {}): number;
+declare function t(_: "child.variable_types.key_of_float", _?: {}): number;
+declare function t(_: "child.variable_types.key_of_boolean", _?: {}): boolean;
+declare function t(_: "child.variable_types.key_of_null", _?: {}): null;
+declare function t(_: "children", _?: {}): { +"first_name": string, +"familly_name": string }[];
+declare function t(_: "children.[0]", _?: {}): { +"first_name": string, +"familly_name": string };
+declare function t(_: "children.[0].first_name", _?: {}): string;
+declare function t(_: "children.[0].familly_name", _?: {}): string;
+declare function t(_: "children.[1]", _?: {}): { +"first_name": string, +"familly_name": string };
+declare function t(_: "children.[1].first_name", _?: {}): string;
+declare function t(_: "children.[1].familly_name", _?: {}): string;
+declare function t(_: "array_of_empty_object", _?: {}): {}[];
+declare function t(_: "array_of_empty_object.[0]", _?: {}): {};
+declare function t(_: "allow-comupted-properties", _?: {}): { +"0": string, +"foo-bar": boolean };
+declare function t(_: "allow-comupted-properties.0", _?: {}): string;
+declare function t(_: "allow-comupted-properties.foo-bar", _?: {}): boolean;
 
 export type TFunction = typeof t

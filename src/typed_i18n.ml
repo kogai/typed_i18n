@@ -19,15 +19,13 @@ module Flow = struct
   let definition format {path; value;} =
     let fname = "t" in
     let typedef = Easy_format.Pretty.to_string @@ format value in
-    let result = "declare function " ^ fname ^ "(_: \""^ path ^ "\"): " ^ typedef ^ ";"in
+    let result = sprintf "declare function %s(_: \"%s\", _?: {}): %s;" fname path typedef in
     Atom (result, atom)
   let definitions contents =
     contents
     |> List.map ~f:Easy_format.Pretty.to_string
     |> String.concat ~sep:"\n"
-    |> (fun content ->
-        "// @flow\n\n" ^ content ^ "\n\nexport type TFunction = typeof t\n"
-      )
+    |> sprintf "// @flow\n\n%s\n\nexport type TFunction = typeof t\n"
 end
 
 module Typescript = struct
@@ -36,7 +34,7 @@ module Typescript = struct
   let read_only_tag =  Some "readonly "
   let definition format {path; value;} =
     let typedef = Easy_format.Pretty.to_string @@ format value in
-    Atom ("(_: \""^ path ^ "\"): " ^ typedef, atom)
+    Atom (sprintf "(_: \"%s\", __?: {}): %s" path typedef, atom)
 
   let definitions contents =
     let methods = List (
