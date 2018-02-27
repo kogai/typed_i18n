@@ -1,0 +1,9 @@
+(jbuild_version 1)
+
+(executable
+ ((name typed_i18n)
+  (libraries (yojson core textutils cmdliner easy-format str ppx_blob))
+  (preprocess (pps (ppx_blob)))
+  (preprocessor_deps (../package.json))
+  (js_of_ocaml ((flags (--dev --disable genprim))))))
+  
