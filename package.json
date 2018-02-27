@@ -5,7 +5,8 @@
   "bin": "index.js",
   "scripts": {
     "build:native": "jbuilder build src/typed_i18n.exe",
-    "build:js": "jbuilder build src/typed_i18n.bc.js"
+    "build:js": "jbuilder build src/typed_i18n.bc.js",
+    "start": "node _build/default/src/typed_i18n.bc.js"
   },
   "esy": {
     "build": [
