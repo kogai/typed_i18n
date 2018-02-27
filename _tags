@@ -1,2 +1,0 @@
-true: annot, thread
-<src/*.ml>: package(ppx_blob)

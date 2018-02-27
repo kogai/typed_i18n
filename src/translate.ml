@@ -17,7 +17,6 @@ module Translator (Impl: Translatable) : (sig
   val output_filename: string -> string -> string
   val definitions: Easy_format.t list -> string
 end with type t = Impl.t) = struct
-  open Core
   open Easy_format
   type t = Impl.t
 
@@ -26,7 +25,7 @@ end with type t = Impl.t) = struct
     | `Assoc [] -> Atom ("{}", atom)
     | `Assoc xs -> List (
         ("{", ",", "}", list),
-        List.map ~f:format_field xs
+        List.map format_field xs
       )
     | `List xs -> format_list xs
     | `Bool _ -> Atom ("boolean", atom)
@@ -35,11 +34,14 @@ end with type t = Impl.t) = struct
     | `String _ -> Atom ("string", atom)
     | `Null -> Atom ("null", atom)
   and format_field (key, value) =
-    let read_only_tag = Option.value Impl.read_only_tag ~default:"" in
-    let prop = sprintf "%s\"%s\":" read_only_tag key in
+    let read_only_tag = match Impl.read_only_tag with
+      | Some(s) -> s
+      | None -> "" 
+    in
+    let prop = Format.sprintf "%s\"%s\":" read_only_tag key in
     Label ((Atom (prop, atom), label), format value)
   and format_list xs =
-    let array_or_tuple = List.map ~f:format xs in
+    let array_or_tuple = List.map format xs in
     if is_array array_or_tuple then
       match array_or_tuple with
       | [] -> raise Unreachable
@@ -49,18 +51,17 @@ end with type t = Impl.t) = struct
   and is_array = function
     | [] -> true
     | x::xs -> xs
-               |> List.fold
-                 ~init:(x, true)
-                 ~f:(fun (before, is_array') next -> (next, is_array' && before = next))
-               |> Tuple2.get2
+               |> List.fold_left
+                 (fun (before, is_array') next -> (next, is_array' && before = next))
+                 (x, true)
+               |> (fun (_, x) -> x)
 
   let definition = Impl.definition format
   let definitions = Impl.definitions
 
   let output_filename path namespace =
     let filename = Filename.basename path in
-    match Filename.split_extension filename with 
-    | filename, Some ("json") -> filename ^ "." ^ namespace ^ "." ^ Impl.extension 
-    | _, Some x -> raise @@ Invalid_extension (Some x)
-    | _ -> raise @@ Invalid_extension None
+    match Filename.chop_extension filename with
+    | name -> Format.sprintf "%s.%s.%s" name namespace Impl.extension
+    | exception _ -> raise (Invalid_extension None)
 end

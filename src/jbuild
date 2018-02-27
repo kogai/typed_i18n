@@ -2,8 +2,8 @@
 
 (executable
  ((name typed_i18n)
-  (libraries (yojson core textutils cmdliner easy-format str ppx_blob))
+  (libraries (yojson textutils cmdliner easy-format str ppx_blob))
   (preprocess (pps (ppx_blob)))
   (preprocessor_deps (../package.json))
-  (js_of_ocaml ((flags (+weak.js +nat.js +base/runtime.js +core_kernel/runtime.js +bin_prot/runtime.js +toplevel.js --disable genprim))))))
+  (js_of_ocaml ((flags (+weak.js +nat.js +base/runtime.js +bin_prot/runtime.js +toplevel.js --disable genprim))))))
   
