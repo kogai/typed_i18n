@@ -1,4 +1,3 @@
-open Core
 open Easy_format
 open Textutils.Std
 
@@ -19,13 +18,13 @@ module Flow = struct
   let definition format {path; value;} =
     let fname = "t" in
     let typedef = Easy_format.Pretty.to_string @@ format value in
-    let result = sprintf "declare function %s(_: \"%s\", _?: {}): %s;" fname path typedef in
+    let result = Format.sprintf "declare function %s(_: \"%s\", _?: {}): %s;" fname path typedef in
     Atom (result, atom)
   let definitions contents =
     contents
-    |> List.map ~f:Easy_format.Pretty.to_string
-    |> String.concat ~sep:"\n"
-    |> sprintf "// @flow\n\n%s\n\nexport type TFunction = typeof t\n"
+    |> List.map Easy_format.Pretty.to_string
+    |> String.concat "\n"
+    |> Format.sprintf "// @flow\n\n%s\n\nexport type TFunction = typeof t\n"
 end
 
 module Typescript = struct
@@ -34,7 +33,7 @@ module Typescript = struct
   let read_only_tag =  Some "readonly "
   let definition format {path; value;} =
     let typedef = Easy_format.Pretty.to_string @@ format value in
-    Atom (sprintf "(_: \"%s\", __?: {}): %s" path typedef, atom)
+    Atom (Format.sprintf "(_: \"%s\", __?: {}): %s" path typedef, atom)
 
   let definitions contents =
     let methods = List (
@@ -62,18 +61,20 @@ let insert_dot k1 k2 =
 let rec walk ?(path = "") = Yojson.Basic.(function
     | `Assoc xs as value ->
       let current = { path; value; } in
-      let children = List.fold
+      let children = List.fold_left
+          (fun acc (k, v) -> acc @ walk ~path:(insert_dot path k) v)
+          []
           xs
-          ~init:[]
-          ~f:(fun acc (k, v) -> acc @ walk ~path:(insert_dot path k) v) in
+      in
       if path = "" then children
       else current :: children
     | `List xs as value ->
       let current = { path; value; } in
-      let children = List.foldi
-          xs
-          ~init:[]
-          ~f:(fun i acc x -> acc @ walk ~path:(insert_dot path "[" ^ string_of_int i ^ "]") x) in
+      let children = List.fold_left
+          (fun acc (i, x) -> acc @ walk ~path:(insert_dot path "[" ^ string_of_int i ^ "]") x)
+          [] 
+          (Utils.with_idx xs)
+      in
 
       current :: children
     | value -> [{ path; value; }]
@@ -82,7 +83,7 @@ let rec walk ?(path = "") = Yojson.Basic.(function
 module Logger : sig
   type t = [`Warn | `Error | `Info]
 
-  val log: t -> ('a, Out_channel.t, unit) format -> 'a
+  val log: t -> ('a, out_channel, unit) format -> 'a
 end = struct
   open Console
   type t = [`Warn | `Error | `Info]
@@ -106,7 +107,7 @@ end = struct
   open Yojson.Basic.Util
 
   let rec find tree key =
-    match String.split ~on:'.' key with
+    match Str.split (Str.regexp_string ".") key with
     | [] -> raise Unreachable
     | ""::[] ->
       print_endline "Maybe unreachable";
@@ -118,7 +119,7 @@ end = struct
         index (int_of_string idx) tree
       ) else
         member key tree
-    | k::ks -> find (member k tree) (String.concat ~sep:"." ks)
+    | k::ks -> find (member k tree) (String.concat "." ks)
 
   let correct primary secondary =
     let impl = create_translator "flow" in
@@ -131,7 +132,7 @@ end = struct
 
     primary
     |> walk
-    |> List.map ~f:(fun { path; value; } ->
+    |> List.map (fun { path; value; } ->
         let is_match =
           try
             (type_of_json (find secondary path) = type_of_json value)
@@ -139,8 +140,8 @@ end = struct
           | Yojson.Basic.Util.Type_error _ -> false
         in
         path, is_match)
-    |> List.filter ~f:(fun (_, is_match) -> not is_match)
-    |> List.map ~f:Tuple2.get1
+    |> List.filter (fun (_, is_match) -> not is_match)
+    |> List.map (fun (x, _) -> x)
 
   let check (p_lang, p_json) (s_lang, s_json) =
     correct p_json s_json
@@ -149,16 +150,16 @@ end = struct
            Logger.log `Warn "[%s] and [%s] are not compatible\n" p_lang s_lang;
         );
         errors)
-    |> List.iter ~f:(fun path -> Logger.log `Warn "[%s] isn't compatible\n" path)
+    |> List.iter (fun path -> Logger.log `Warn "[%s] isn't compatible\n" path)
 end
 
 let check_compatibility  = function
   | [] -> raise @@ Invalid_language_key None
   | ((primary_lang, primary_json)::rest_langs) ->
     List.iter
-      ~f:(fun (other_lang, other_json) -> 
-          Compatible.check (primary_lang, primary_json) (other_lang, other_json);
-        )
+      (fun (other_lang, other_json) -> 
+         Compatible.check (primary_lang, primary_json) (other_lang, other_json);
+      )
       rest_langs
 
 let handle_language prefer_lang namespaces json =
@@ -172,11 +173,11 @@ let handle_language prefer_lang namespaces json =
   check_compatibility languages;
 
   languages
-  |> List.find ~f:(fun (l, _) -> l = prefer_lang)
+  |> Utils.find (fun (l, _) -> l = prefer_lang)
   |> (function
       | Some (_, json) ->
         Yojson.Basic.(namespaces
-                      |> List.map ~f:(fun name ->
+                      |> List.map (fun name ->
                           (match Util.member name json with
                            | `Null -> raise @@ Invalid_namespace_key name
                            | json -> name, (walk json))
@@ -184,20 +185,21 @@ let handle_language prefer_lang namespaces json =
       | _ -> raise Unreachable)
 
 let translate ~input_file ~output_dir ~languages (namespace, path_and_values) =
-  List.iter languages ~f:(fun lang ->
+  List.iter (fun lang ->
       let impl = create_translator lang in
       let module Impl = (val impl) in
       let module M = Translate.Translator (Impl) in
 
       path_and_values
-      |> List.map ~f:M.definition
+      |> List.map M.definition
       |> M.definitions
       |> (fun content ->
           let dist = output_dir ^ "/" ^ M.output_filename input_file namespace in
-          Out_channel.write_all dist content;
+          let oc = open_out dist in
+          output_string oc content;
           Logger.log `Info "Generated %s\n" dist
         )
-    ) 
+    ) languages
 
 module Cmd : sig
   val name: string
@@ -216,8 +218,8 @@ end = struct
 
   let name= "name"
             |> get_from_package_json
-            |> String.split ~on:'/'
-            |> List.last_exn
+            |> Str.split (Str.regexp_string "/")
+            |> Utils.last_exn
 
   let version = "version"
                 |> get_from_package_json
@@ -249,7 +251,7 @@ end = struct
       input_file
       |> Yojson.Basic.from_file
       |> handle_language prefer namespaces
-      |> List.iter ~f:(translate ~input_file ~output_dir ~languages)
+      |> List.iter (translate ~input_file ~output_dir ~languages)
     with
     | Invalid_namespace_key key -> Logger.log `Error "Invalid namespace [%s] designated\n" key
     | Invalid_language_key None -> Logger.log `Error "Language key isn't existed\n"
