@@ -82,19 +82,16 @@ let rec walk ?(path = "") = Yojson.Basic.(function
 
 module Logger : sig
   type t = [`Warn | `Error | `Info]
-
   val log: t -> ('a, out_channel, unit) format -> 'a
 end = struct
-  open Console
   type t = [`Warn | `Error | `Info]
 
   let log level =
     (match level with
-     | `Warn -> Ansi.printf [`Yellow] "[WARN]: "
-     | `Error -> Ansi.printf [`Red] "[ERROR]: "
-     | `Info -> Ansi.printf [`Cyan] "[INFO]: "
+     | `Warn -> Printf.printf 
+     | `Error -> Printf.printf
+     | `Info -> Printf.printf
     );
-    Console.Ansi.printf [`White]
 end
 
 module Compatible : sig
