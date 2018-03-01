@@ -18,6 +18,7 @@ PKG core_kernel.base_for_tests
 PKG easy-format
 PKG fieldslib
 PKG jane-street-headers
+PKG js_of_ocaml
 PKG num
 PKG num.core
 PKG ocaml-migrate-parsetree
@@ -42,6 +43,7 @@ PKG textutils
 PKG threads
 PKG threads.posix
 PKG typerep
+PKG uchar
 PKG unix
 PKG variantslib
 PKG yojson
