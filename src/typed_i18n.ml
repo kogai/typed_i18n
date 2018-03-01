@@ -87,12 +87,14 @@ module Logger : sig
 end = struct
   type t = [`Warn | `Error | `Info]
 
+  (* Consider to use Lwt_log_js *)
   let log level =
     (match level with
-     | `Warn -> Printf.printf 
-     | `Error -> Printf.printf
-     | `Info -> Printf.printf
+     | `Warn -> Printf.printf "[WARN]: "
+     | `Error -> Printf.printf "[ERROR]: "
+     | `Info -> Printf.printf "[INFO]: "
     );
+    Printf.printf
 end
 
 module Compatible : sig
@@ -120,11 +122,6 @@ end = struct
          in
          index (int_of_string idx) tree
        | None -> member key tree)
-    (* if Regexp.string_match r k 0 then (
-       let idx = Regexp.matched_group 1 k in
-       index (int_of_string idx) tree
-       ) else
-       member key tree *)
     | k::ks -> find (member k tree) (String.concat "." ks)
 
   let correct primary secondary =
