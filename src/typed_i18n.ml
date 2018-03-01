@@ -1,3 +1,4 @@
+open Js_of_ocaml
 open Easy_format
 open Textutils.Std
 
@@ -104,15 +105,15 @@ end = struct
   open Yojson.Basic.Util
 
   let rec find tree key =
-    match Str.split (Str.regexp_string ".") key with
+    match Regexp.split (Regexp ".") key with
     | [] -> raise Unreachable
     | ""::[] ->
       print_endline "Maybe unreachable";
       member key tree
     | k::[] ->
-      let r = Str.regexp "^\\[\\([0-9]\\)\\]$" in
-      if Str.string_match r k 0 then (
-        let idx = Str.matched_group 1 k in
+      let r = Js.Regexp "^\\[\\([0-9]\\)\\]$" in
+      if Js.Regexp.string_match r k 0 then (
+        let idx = Js.Regexp.matched_group 1 k in
         index (int_of_string idx) tree
       ) else
         member key tree
@@ -215,7 +216,7 @@ end = struct
 
   let name= "name"
             |> get_from_package_json
-            |> Str.split (Str.regexp_string "/")
+            |> Js.Regexp.split (Js.Regexp.regexp_string "/")
             |> Utils.last_exn
 
   let version = "version"
