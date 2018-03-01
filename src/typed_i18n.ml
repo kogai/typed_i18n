@@ -105,18 +105,26 @@ end = struct
   open Yojson.Basic.Util
 
   let rec find tree key =
-    match Regexp.split (Regexp ".") key with
+    match Regexp.split (Regexp.regexp_string ".") key with
     | [] -> raise Unreachable
     | ""::[] ->
       print_endline "Maybe unreachable";
       member key tree
     | k::[] ->
-      let r = Js.Regexp "^\\[\\([0-9]\\)\\]$" in
-      if Js.Regexp.string_match r k 0 then (
-        let idx = Js.Regexp.matched_group 1 k in
-        index (int_of_string idx) tree
-      ) else
-        member key tree
+      let r = Regexp.regexp_string "^\\[\\([0-9]\\)\\]$" in
+      (match Regexp.string_match r k 0 with
+       | Some r -> 
+         let idx = match (Regexp.matched_group r 1) with
+           | Some i -> i
+           | _ -> "0"
+         in
+         index (int_of_string idx) tree
+       | None -> member key tree)
+    (* if Regexp.string_match r k 0 then (
+       let idx = Regexp.matched_group 1 k in
+       index (int_of_string idx) tree
+       ) else
+       member key tree *)
     | k::ks -> find (member k tree) (String.concat "." ks)
 
   let correct primary secondary =
@@ -216,7 +224,7 @@ end = struct
 
   let name= "name"
             |> get_from_package_json
-            |> Js.Regexp.split (Js.Regexp.regexp_string "/")
+            |> Regexp.split (Regexp.regexp_string "/")
             |> Utils.last_exn
 
   let version = "version"
