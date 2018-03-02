@@ -1,5 +1,6 @@
 NAME := typed_i18n
 OCB := jbuilder
+DIST := _build/default/src
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_FILES += package.json
 SRC_DIRS := "src"
@@ -17,11 +18,11 @@ $(NAME).js: $(SRC_FILES)
 
 .PHONY: native
 native: $(NAME).native
-	@./$(NAME).exe $(ARGS)
+	@./$(DIST)/$(NAME).exe $(ARGS)
 
 .PHONY: js
 js: $(NAME).js
-	@./$(NAME).js $(ARGS)
+	node ./index.js $(ARGS)
 
 .PHONY: test
 test:
