@@ -31,8 +31,8 @@ test:
 	yarn test
 
 publish: $(NAME).js
-	npm version patch
 	git commit -a -m "bump bin"
+	npm version patch
 	git push
 	npm publish --access public
 
