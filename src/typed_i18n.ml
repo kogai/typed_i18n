@@ -1,6 +1,5 @@
 open Js_of_ocaml
 open Easy_format
-open Textutils.Std
 
 type ty = {
   path: string;
@@ -86,15 +85,13 @@ module Logger : sig
   val log: t -> ('a, out_channel, unit) format -> 'a
 end = struct
   open Lwt_log_js
-
   type t = [`Warn | `Error | `Info]
 
-  (* Consider to use Lwt_log_js *)
   let log level =
     (match level with
-     | `Warn -> warning "[WARN]: "
-     | `Error -> error "[ERROR]: "
-     | `Info -> info "[INFO]: "
+     | `Info -> Printf.printf "[INFO]: "
+     | `Warn -> Printf.printf "[WARN]: "
+     | `Error -> Printf.eprintf "[ERROR]: "
     );
     Printf.printf
 end
@@ -251,7 +248,6 @@ end = struct
     Arg.(value & opt_all string ["flow"] & info ["l"; "languages"] ~docv:"LANGUAGES" ~doc)
 
   let run input_file output_dir prefer namespaces languages =
-    let open Console in
     try
       input_file
       |> Yojson.Basic.from_file

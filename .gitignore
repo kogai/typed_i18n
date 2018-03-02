@@ -23,3 +23,5 @@ setup.log
 !sandbox/
 example/src/*.js.flow
 example/src/*.d.ts
+src/.merlin
+index.js
