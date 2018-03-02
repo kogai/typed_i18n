@@ -24,5 +24,3 @@ setup.log
 example/src/*.js.flow
 example/src/*.d.ts
 src/.merlin
-index.js
-!example/src/index.js
