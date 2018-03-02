@@ -85,14 +85,16 @@ module Logger : sig
   type t = [`Warn | `Error | `Info]
   val log: t -> ('a, out_channel, unit) format -> 'a
 end = struct
+  open Lwt_log_js
+
   type t = [`Warn | `Error | `Info]
 
   (* Consider to use Lwt_log_js *)
   let log level =
     (match level with
-     | `Warn -> Printf.printf "[WARN]: "
-     | `Error -> Printf.printf "[ERROR]: "
-     | `Info -> Printf.printf "[INFO]: "
+     | `Warn -> warning "[WARN]: "
+     | `Error -> error "[ERROR]: "
+     | `Info -> info "[INFO]: "
     );
     Printf.printf
 end

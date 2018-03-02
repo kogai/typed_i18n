@@ -1,5 +1,5 @@
 B ../_build/default/src
-FLG -ppx "../_build/default/.ppx/ppx_blob/ppx.exe --as-ppx"
+FLG -ppx '/Users/kogaishinichi/typed_i18n/_build/default/.ppx/ppx_blob/ppx.exe --as-ppx'
 FLG -w -40
 PKG base
 PKG base.caml
@@ -19,6 +19,9 @@ PKG easy-format
 PKG fieldslib
 PKG jane-street-headers
 PKG js_of_ocaml
+PKG js_of_ocaml-lwt.logger
+PKG lwt
+PKG lwt.log
 PKG num
 PKG num.core
 PKG ocaml-migrate-parsetree
@@ -47,3 +50,4 @@ PKG uchar
 PKG unix
 PKG variantslib
 PKG yojson
+S .
