@@ -6,22 +6,7 @@
   "scripts": {
     "build:native": "jbuilder build src/typed_i18n.exe",
     "build:js": "jbuilder build src/typed_i18n.bc.js",
-    "start": "node _build/default/src/typed_i18n.bc.js",
-    "pre:publish": "mv _build/default/src/typed_i18n.bc.js index.js && npm version patch",
-    "deploy": "npm publish --access public"
-  },
-  "esy": {
-    "build": [
-      [
-        "jbuilder",
-        "build",
-        "src/typed_i18n.bc.js"
-      ]
-    ],
-    "install": [
-      "esy-installer"
-    ],
-    "buildsInSource": "_build"
+    "start": "node _build/default/src/typed_i18n.bc.js"
   },
   "repository": {
     "type": "git",
