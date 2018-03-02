@@ -14,7 +14,8 @@ $(NAME).native: $(SRC_FILES)
 
 $(NAME).js: $(SRC_FILES)
 	$(OCB) build src/typed_i18n.bc.js
-	mv _build/default/src/typed_i18n.bc.js index.js
+	mv _build/default/src/typed_i18n.bc.js typed_i18n.bc.js
+	chmod 777 typed_i18n.bc.js
 
 .PHONY: native
 native: $(NAME).native

@@ -26,15 +26,15 @@ module Translator =
   type t = Impl.t;
   let rec format =
     fun
-    | `List([]) => [@implicit_arity] Atom("[]", atom)
-    | `Assoc([]) => [@implicit_arity] Atom("{}", atom)
-    | `Assoc(xs) => [@implicit_arity] List(("{", ",", "}", list), List.map(format_field, xs))
+    | `List([]) => Atom("[]", atom)
+    | `Assoc([]) => Atom("{}", atom)
+    | `Assoc(xs) => List(("{", ",", "}", list), List.map(format_field, xs))
     | `List(xs) => format_list(xs)
-    | `Bool(_) => [@implicit_arity] Atom("boolean", atom)
-    | `Float(_) => [@implicit_arity] Atom("number", atom)
-    | `Int(_) => [@implicit_arity] Atom("number", atom)
-    | `String(_) => [@implicit_arity] Atom("string", atom)
-    | `Null => [@implicit_arity] Atom("null", atom)
+    | `Bool(_) => Atom("boolean", atom)
+    | `Float(_) => Atom("number", atom)
+    | `Int(_) => Atom("number", atom)
+    | `String(_) => Atom("string", atom)
+    | `Null => Atom("null", atom)
   and format_field = ((key, value)) => {
     let read_only_tag =
       switch Impl.read_only_tag {
@@ -42,17 +42,17 @@ module Translator =
       | None => ""
       };
     let prop = Format.sprintf("%s\"%s\":", read_only_tag, key);
-    [@implicit_arity] Label(([@implicit_arity] Atom(prop, atom), label), format(value))
+    Label((Atom(prop, atom), label), format(value))
   }
   and format_list = (xs) => {
     let array_or_tuple = List.map(format, xs);
     if (is_array(array_or_tuple)) {
       switch array_or_tuple {
       | [] => raise(Unreachable)
-      | [x, ..._] => [@implicit_arity] Atom(Pretty.to_string(x) ++ "[]", atom)
+      | [x, ..._] => Atom(Pretty.to_string(x) ++ "[]", atom)
       }
     } else {
-      [@implicit_arity] List(("[", ",", "]", list), array_or_tuple)
+      List(("[", ",", "]", list), array_or_tuple)
     }
   }
   and is_array =

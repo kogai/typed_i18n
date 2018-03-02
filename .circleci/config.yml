@@ -9,7 +9,9 @@ jobs:
       - restore_cache:
           name: Restore cache
           keys:
-            - cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "example/yarn.lock" }}
+            - >-
+              cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum
+              "example/yarn.lock" }}
       - run:
           name: Install dependencies
           command: cd example && yarn install
@@ -18,7 +20,9 @@ jobs:
           paths:
             - ~/.yarn
             - ~/typed_i18n/example/node_modules
-          key: cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "example/yarn.lock" }}
+          key: >-
+            cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum
+            "example/yarn.lock" }}
       - run:
           name: Run tests
-          command: make test-ci
+          command: make test
