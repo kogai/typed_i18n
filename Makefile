@@ -1,80 +1,38 @@
 NAME := typed_i18n
-TEST_NAME := $(NAME)_test
-PKGS := core,yojson,cmdliner,easy-format,ppx_blob,textutils,str
+OCB := jbuilder
 SRC_FILES := $(shell find ./src -type f -name '*.ml')
 SRC_FILES += package.json
 SRC_DIRS := "src"
-
-OCB_FLAGS := -use-ocamlfind -Is $(SRC_DIRS) -pkgs $(PKGS)
-OCB := ocamlbuild $(OCB_FLAGS)
 OPAM_VER := 4.03.0
 ARGS := -i fixture/locale.json -o fixture -p ja -l flow -l typescript
-OS := $(shell uname -s)
 
-all:$(NAME).native $(NAME).byte bin/$(NAME).$(OS)
+all:$(NAME).native $(NAME).js
 
 $(NAME).native: $(SRC_FILES)
-	eval `opam config env` && \
-	$(OCB) $(NAME).native
+	$(OCB) build src/typed_i18n.exe
 
-$(NAME).byte: $(SRC_FILES)
-	eval `opam config env` && \
-	$(OCB) $(NAME).byte
-
-bin/$(NAME).$(OS): $(NAME).native
-	mkdir -p bin
-	cp _build/src/$(NAME).native bin/$(NAME).$(OS)
-
-.PHONY: docker
-docker:
-	docker build -t $(NAME) . && \
-	docker run -t $(NAME)
+$(NAME).js: $(SRC_FILES)
+	$(OCB) build src/typed_i18n.bc.js
+	mv _build/default/src/typed_i18n.bc.js index.js
 
 .PHONY: native
 native: $(NAME).native
-	@./$(NAME).native $(ARGS)
+	@./$(NAME).exe $(ARGS)
 
-.PHONY: byte
-byte: $(NAME).byte
-	@./$(NAME).byte $(ARGS)
-
-.PHONY: run
-run: native byte
-
-$(TEST_NAME).native: $(SRC_FILES)
-	$(OCB) $(TEST_NAME).native
-
-$(TEST_NAME).byte: $(SRC_FILES)
-	$(OCB) $(TEST_NAME).byte
+.PHONY: js
+js: $(NAME).js
+	@./$(NAME).js $(ARGS)
 
 .PHONY: test
-test: test-native test-byte
-
-.PHONY: test-native
-test-native: $(TEST_NAME).native
-	@./$(TEST_NAME).native
-
-.PHONY: test-byte
-test-byte: $(TEST_NAME).byte
-	@./$(TEST_NAME).byte
-
-.PHONY: test-ci
-test-ci:
+test:
 	cd example && \
 	yarn test
 
-.PHONY: pre-publish
-pre-publish: clean
+publish: $(NAME).js
 	npm version patch
-	make
-	make docker
-	docker cp $(shell docker ps -alq):/typed_i18n/bin/typed_i18n.Linux ./bin
-	git commit -a -m "bump binary"
-
-.PHONY: publish
-publish: pre-publish
-	npm publish --access public
+	git commit -a -m "bump bin"
 	git push
+	npm publish --access public
 
 .PHONY: install
 install:
@@ -83,18 +41,14 @@ install:
 	eval `opam config env` && \
 	opam update && \
 	opam install -y \
-		ocamlfind \
-		core \
 		yojson \
 		easy-format \
 		cmdliner \
-		textutils \
-		ppx_blob
-
-.PHONY: setup
-setup: install
+		ppx_blob \
+		js_of_ocaml \
+		js_of_ocaml-lwt
 	opam user-setup install
 
 .PHONY: clean
 clean:
-	$(OCB) -clean
+	$(OCB) clean

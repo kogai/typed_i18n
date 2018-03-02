@@ -10,5 +10,8 @@ typed_i18n.native
 fixture/
 example/
 .vscode/
+.circleci/
+.git/
 _build/
 src/
+node_modules/
