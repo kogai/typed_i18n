@@ -10,7 +10,6 @@
     "test": "cd example && yarn test",
     "start": "node src/typed_i18n.bs.js",
     "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript",
-    "postinstall": "yarn build",
     "prepublish": "yarn build"
   },
   "repository": {
