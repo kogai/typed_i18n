@@ -4,8 +4,9 @@
   "description": "Type safe i18n with Flow and TypeScript",
   "bin": "index.js",
   "scripts": {
-    "build:native": "jbuilder build src/typed_i18n.exe",
-    "build:js": "jbuilder build src/typed_i18n.bc.js",
+    "clean": "bsb -clean-world",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w",
     "start": "./index.js"
   },
   "repository": {
@@ -13,15 +14,24 @@
     "url": "git+https://github.com/kogai/typed_i18n.git"
   },
   "keywords": [
+    "BuckleScript",
     "flow",
     "typescript",
     "ocaml",
+    "reasonml",
     "i18n"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Shinichi Kogai",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kogai/typed_i18n/issues"
   },
-  "homepage": "https://github.com/kogai/typed_i18n#readme"
+  "homepage": "https://github.com/kogai/typed_i18n#readme",
+  "devDependencies": {
+    "bs-platform": "2.2.2"
+  },
+  "dependencies": {
+    "bs-cmdliner": "file:../bs-cmdliner",
+    "bs-easy-format": "file:../bs-easy-format"
+  }
 }

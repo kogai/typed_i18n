@@ -16,4 +16,4 @@ let rec last_exn =
   fun
   | [] => raise(Not_found)
   | [x] => x
-  | [x, ...xs] => last_exn(xs);
+  | [_, ...xs] => last_exn(xs);
