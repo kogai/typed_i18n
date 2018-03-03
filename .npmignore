@@ -13,5 +13,4 @@ example/
 .circleci/
 .git/
 _build/
-src/
 node_modules/
