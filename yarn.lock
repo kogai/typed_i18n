@@ -10,6 +10,6 @@ bs-easy-format@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/bs-easy-format/-/bs-easy-format-0.1.0.tgz#4dbc100a19ee06190b34183a336e6892fd460ed9"
 
-bs-platform@2.2.2:
+bs-platform@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-2.2.2.tgz#95ff37719771bbf310e8376fedd1148865c0da19"

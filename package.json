@@ -1,6 +1,6 @@
 {
   "name": "@kogai/typed_i18n",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Type safe i18n with Flow and TypeScript",
   "bin": "index.js",
   "scripts": {
@@ -30,10 +30,8 @@
     "url": "https://github.com/kogai/typed_i18n/issues"
   },
   "homepage": "https://github.com/kogai/typed_i18n#readme",
-  "devDependencies": {
-    "bs-platform": "2.2.2"
-  },
   "dependencies": {
+    "bs-platform": "^2.2.2",
     "bs-cmdliner": "^0.1.0",
     "bs-easy-format": "^0.1.0"
   }
