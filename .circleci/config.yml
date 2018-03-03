@@ -17,7 +17,6 @@ jobs:
           command: |
             yarn install
             yarn build
-            yarn bundle
             cd example && yarn install
       - save_cache:
           name: Save cache
