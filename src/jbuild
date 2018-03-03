@@ -1,9 +1,0 @@
-(jbuild_version 1)
-
-(executable
- ((name typed_i18n)
-  (libraries (js_of_ocaml js_of_ocaml-lwt.logger yojson cmdliner easy-format ppx_blob))
-  (preprocess (pps (ppx_blob)))
-  (preprocessor_deps (../package.json))
-  (js_of_ocaml ((flags (+weak.js +nat.js +base/runtime.js +bin_prot/runtime.js +toplevel.js --disable genprim))))))
-  
