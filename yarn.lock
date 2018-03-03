@@ -2,11 +2,13 @@
 # yarn lockfile v1
 
 
-"bs-cmdliner@file:../bs-cmdliner":
+bs-cmdliner@^0.1.0:
   version "0.1.0"
+  resolved "https://registry.yarnpkg.com/bs-cmdliner/-/bs-cmdliner-0.1.0.tgz#05ce40b37ced0821fa0e483f3ac6e2bbf2778023"
 
-"bs-easy-format@file:../bs-easy-format":
+bs-easy-format@^0.1.0:
   version "0.1.0"
+  resolved "https://registry.yarnpkg.com/bs-easy-format/-/bs-easy-format-0.1.0.tgz#4dbc100a19ee06190b34183a336e6892fd460ed9"
 
 bs-platform@2.2.2:
   version "2.2.2"

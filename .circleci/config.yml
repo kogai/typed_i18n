@@ -14,15 +14,18 @@ jobs:
               "example/yarn.lock" }}
       - run:
           name: Install dependencies
-          command: cd example && yarn install
+          command: |
+            yarn install
+            cd example && yarn install
       - save_cache:
           name: Save cache
           paths:
             - ~/.yarn
+            - ~/typed_i18n/node_modules
             - ~/typed_i18n/example/node_modules
           key: >-
             cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum
             "example/yarn.lock" }}
       - run:
           name: Run tests
-          command: make test
+          command: yarn test
