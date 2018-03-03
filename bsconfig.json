@@ -10,6 +10,7 @@
   },
   "suffix": ".bs.js",
   "warnings": {
+    "number": "-44",
     "error": "+101"
   },
   "refmt": 3,
