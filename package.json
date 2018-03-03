@@ -10,8 +10,8 @@
     "test": "cd example && yarn test",
     "start": "node src/typed_i18n.bs.js",
     "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript",
-    "bundle": "rollup src/typed_i18n.bs.js --o bundle.bs.js --f cjs",
-    "prepublish": "yarn build && yarn bundle"
+    "postinstall": "npm run build",
+    "prepublish": "yarn build"
   },
   "repository": {
     "type": "git",
@@ -31,12 +31,9 @@
     "url": "https://github.com/kogai/typed_i18n/issues"
   },
   "homepage": "https://github.com/kogai/typed_i18n#readme",
-  "devDependencies": {
-    "bs-platform": "^2.2.2",
-    "rollup": "^0.56.3"
-  },
   "dependencies": {
     "bs-cmdliner": "^0.1.0",
+    "bs-platform": "^2.2.2",
     "bs-easy-format": "^0.1.0"
   }
 }
