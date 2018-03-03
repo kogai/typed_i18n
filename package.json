@@ -1,6 +1,6 @@
 {
   "name": "@kogai/typed_i18n",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "Type safe i18n with Flow and TypeScript",
   "bin": "index.js",
   "scripts": {
