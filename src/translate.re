@@ -6,7 +6,7 @@ module type Translatable = {
   type t;
   let extension: string;
   let read_only_tag: option(string);
-  let definition: (Yojson.Basic.json => Easy_format.t, t) => Easy_format.t;
+  let definition: (Js.Json.t => Easy_format.t, t) => Easy_format.t;
   let definitions: list(Easy_format.t) => string;
 };
 
@@ -15,7 +15,7 @@ module Translator =
        : (
            {
              type t;
-             let format: Yojson.Basic.json => Easy_format.t;
+             let format: Js.Json.t => Easy_format.t;
              let definition: t => Easy_format.t;
              let output_filename: (string, string) => string;
              let definitions: list(Easy_format.t) => string;
@@ -24,17 +24,24 @@ module Translator =
          ) => {
   open Easy_format;
   type t = Impl.t;
-  let rec format =
-    fun
-    | `List([]) => Atom("[]", atom)
-    | `Assoc([]) => Atom("{}", atom)
-    | `Assoc(xs) => List(("{", ",", "}", list), List.map(format_field, xs))
-    | `List(xs) => format_list(xs)
-    | `Bool(_) => Atom("boolean", atom)
-    | `Float(_) => Atom("number", atom)
-    | `Int(_) => Atom("number", atom)
-    | `String(_) => Atom("string", atom)
-    | `Null => Atom("null", atom)
+  let rec format = json =>
+    switch (Js.Json.classify(json)) {
+    | Js.Json.JSONObject(xs) =>
+      let es = Js.Dict.entries(xs);
+      if (Array.length(es) == 0) {
+        Atom("{}", atom);
+      } else {
+        es
+        |> Array.map(format_field)
+        |> (xs => List(("{", ",", "}", list), Array.to_list(xs)));
+      };
+    | Js.Json.JSONArray(xs) => format_list(Array.to_list(xs))
+    | Js.Json.JSONFalse
+    | Js.Json.JSONTrue => Atom("boolean", atom)
+    | Js.Json.JSONNumber(_) => Atom("number", atom)
+    | Js.Json.JSONString(_) => Atom("string", atom)
+    | Js.Json.JSONNull => Atom("null", atom)
+    }
   and format_field = ((key, value)) => {
     let read_only_tag =
       switch Impl.read_only_tag {
@@ -42,18 +49,18 @@ module Translator =
       | None => ""
       };
     let prop = Format.sprintf("%s\"%s\":", read_only_tag, key);
-    Label((Atom(prop, atom), label), format(value))
+    Label((Atom(prop, atom), label), format(value));
   }
-  and format_list = (xs) => {
+  and format_list = xs => {
     let array_or_tuple = List.map(format, xs);
     if (is_array(array_or_tuple)) {
       switch array_or_tuple {
       | [] => raise(Unreachable)
       | [x, ..._] => Atom(Pretty.to_string(x) ++ "[]", atom)
-      }
+      };
     } else {
-      List(("[", ",", "]", list), array_or_tuple)
-    }
+      List(("[", ",", "]", list), array_or_tuple);
+    };
   }
   and is_array =
     fun
@@ -72,6 +79,6 @@ module Translator =
     switch (Filename.chop_extension(filename)) {
     | name => Format.sprintf("%s.%s.%s", name, namespace, Impl.extension)
     | exception _ => raise(Invalid_extension(None))
-    }
+    };
   };
 };
