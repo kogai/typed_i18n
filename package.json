@@ -2,7 +2,7 @@
   "name": "@kogai/typed_i18n",
   "version": "0.5.2",
   "description": "Type safe i18n with Flow and TypeScript",
-  "bin": "src/typed_i18n.bs.js",
+  "bin": "index.js",
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
