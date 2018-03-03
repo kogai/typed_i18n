@@ -238,8 +238,7 @@ let translate =
         content => {
           let dist =
             output_dir ++ "/" ++ M.output_filename(input_file, namespace);
-          let oc = open_out(dist);
-          output_string(oc, content);
+          Node.Fs.writeFileSync(dist, content, `utf8);
           Logger.log(`Info, "Generated %s\n", dist);
         }
       );
