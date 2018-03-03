@@ -291,8 +291,7 @@ module Cmd: {
   let run = (input_file, output_dir, prefer, namespaces, languages) =>
     try (
       input_file
-      |> Node.Fs.readdirSync
-      |> Js.Array.joinWith("\n")
+      |> Node.Fs.readFileSync(_, `utf8)
       |> Js.Json.parseExn
       |> handle_language(prefer, namespaces)
       |> List.iter(translate(~input_file, ~output_dir, ~languages))
@@ -324,7 +323,18 @@ module Cmd: {
     Term.(const(run) $ input $ output $ prefer $ namespaces $ languages);
 };
 
-let () =
+let () = {
+  let argv =
+    Sys.argv
+    |> Belt.List.ofArray
+    |> Belt.List.tail
+    |> (
+      fun
+      | Some(xs) => Belt.List.toArray(xs)
+      | _ => [||]
+    );
   Cmdliner.(
-    Term.exit @@ Term.eval((Cmd.term, Term.info(Cmd.name, ~version=Cmd.version)))
+    Term.exit @@
+    Term.eval((Cmd.term, Term.info(Cmd.name, ~version=Cmd.version)), ~argv)
   );
+};
