@@ -7,7 +7,9 @@
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
-    "start": "node src/typed_i18n.bs.js"
+    "test": "cd example && yarn test",
+    "start": "node src/typed_i18n.bs.js",
+    "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript"
   },
   "repository": {
     "type": "git",
