@@ -9,7 +9,9 @@
     "watch": "bsb -make-world -w",
     "test": "cd example && yarn test",
     "start": "node src/typed_i18n.bs.js",
-    "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript"
+    "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript",
+    "postinstall": "yarn build",
+    "prepublish": "yarn build"
   },
   "repository": {
     "type": "git",
@@ -33,7 +35,7 @@
     "bs-platform": "2.2.2"
   },
   "dependencies": {
-    "bs-cmdliner": "file:../bs-cmdliner",
-    "bs-easy-format": "file:../bs-easy-format"
+    "bs-cmdliner": "^0.1.0",
+    "bs-easy-format": "^0.1.0"
   }
 }
