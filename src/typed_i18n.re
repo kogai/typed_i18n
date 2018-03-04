@@ -179,7 +179,15 @@ module Compatible: {
         errors;
       }
     )
-    |> List.iter(path => Logger.log(`Warn, "[%s] isn't compatible\n", path));
+    |> (errors => {
+      switch (Belt.List.splitAt(errors, 10)) {
+      | Some((xs, ys)) => {
+        List.iter(path => Logger.log(`Warn, "[%s] isn't compatible\n", path), xs);
+        Logger.log(`Warn, "And there are [%i] imcompatibles left\n", List.length(ys))
+      }
+      | None => List.iter(path => Logger.log(`Warn, "[%s] isn't compatible\n", path), errors)
+      };
+    });
 };
 
 let check_compatibility =
