@@ -8,7 +8,7 @@
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
     "test": "cd example && yarn test",
-    "start": "node src/typed_i18n.bs.js",
+    "start": "yarn build && node src/typed_i18n.bs.js",
     "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript",
     "postinstall": "npm run build",
     "prepublish": "yarn build"
