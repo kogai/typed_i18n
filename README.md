@@ -9,8 +9,8 @@ It generate from
 
 ```json
 {
-  "translation": {
-    "en": {
+  "en": {
+    "translation": {
       "foo": {
         "bar": "some text",
         "buzz": 999
