@@ -28,3 +28,4 @@ example/src/*.js.flow
 example/src/*.d.ts
 .merlin
 *.bs.js
+node_modules
