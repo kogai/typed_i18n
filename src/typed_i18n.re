@@ -109,13 +109,13 @@ module Logger: {
   let log: (t, format('a, out_channel, unit)) => 'a;
 } = {
   type t = [ | `Warn | `Error | `Info];
-  let log = level => {
+  let log = (level, msg) => {
     switch level {
-    | `Info => Printf.printf("[INFO]: ")
-    | `Warn => Printf.printf("[WARN]: ")
-    | `Error => Printf.eprintf("[ERROR]: ")
+    | `Info => Printf.printf("\027[1;32m[INFO]: \027[0m")
+    | `Warn => Printf.printf("\027[1;33m[WARN]: \027[0m")
+    | `Error => Printf.printf("\027[1;31m[ERROR]: \027[0m")
     };
-    Printf.printf;
+    Printf.printf(msg);
   };
 };
 
