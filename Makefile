@@ -13,7 +13,7 @@ src/$(NAME).$(EXT): $(SRC_FILES)
 	$(NPM_BIN)/bsb -make-world
 
 lib/bundle.$(EXT): src/$(NAME).$(EXT)
-	$(NPM_BIN)/webpack src/$(NAME).$(EXT) -o lib/bundle.$(EXT) --target=node
+	$(NPM_BIN)/webpack src/$(NAME).$(EXT) -p -o lib/bundle.$(EXT) --target=node
 
 .PHONY: run
 run:

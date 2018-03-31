@@ -1,16 +1,17 @@
 {
   "name": "@kogai/typed_i18n",
-  "version": "0.5.11",
+  "version": "0.5.12",
   "description": "Type safe i18n with Flow and TypeScript",
   "bin": "index.js",
   "scripts": {
-    "clean": "bsb -clean-world",
+    "clean": "bsb -clean-world && rm -f lib/bundle.bs.js",
     "build": "make src/typed_i18n.bs.js",
+    "build:production": "make lib/bundle.bs.js",
     "watch": "bsb -make-world -w",
     "test": "cd example && yarn test",
     "start": "yarn build && node src/typed_i18n.bs.js",
     "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript",
-    "prepublish": "make lib/bundle.bs.js"
+    "prepublish": "yarn clean && yarn build:production"
   },
   "repository": {
     "type": "git",
