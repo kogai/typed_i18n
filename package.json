@@ -5,13 +5,12 @@
   "bin": "index.js",
   "scripts": {
     "clean": "bsb -clean-world",
-    "build": "bsb -make-world",
+    "build": "make src/typed_i18n.bs.js",
     "watch": "bsb -make-world -w",
     "test": "cd example && yarn test",
     "start": "yarn build && node src/typed_i18n.bs.js",
     "start:build": "yarn start -- -i fixture/locale.json -o fixture -p ja -l flow -l typescript",
-    "postinstall": "npm run build",
-    "prepublish": "yarn build"
+    "prepublish": "make lib/bundle.bs.js"
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,12 @@
   "homepage": "https://github.com/kogai/typed_i18n#readme",
   "dependencies": {
     "bs-cmdliner": "^0.1.0",
+    "bs-easy-format": "^0.1.0",
     "bs-platform": "^2.2.2",
-    "bs-easy-format": "^0.1.0"
+    "webpack": "^4.4.1"
+  },
+  "devDependencies": {
+    "browserify": "^16.1.1",
+    "webpack-cli": "^2.0.13"
   }
 }
