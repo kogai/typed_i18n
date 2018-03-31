@@ -44,7 +44,7 @@ module Translator =
     }
   and format_field = ((key, value)) => {
     let read_only_tag =
-      switch Impl.read_only_tag {
+      switch (Impl.read_only_tag) {
       | Some(s) => s
       | None => ""
       };
@@ -54,7 +54,7 @@ module Translator =
   and format_list = xs => {
     let array_or_tuple = List.map(format, xs);
     if (is_array(array_or_tuple)) {
-      switch array_or_tuple {
+      switch (array_or_tuple) {
       | [] => raise(Unreachable)
       | [x, ..._] => Atom(Pretty.to_string(x) ++ "[]", atom)
       };
@@ -68,8 +68,11 @@ module Translator =
     | [x, ...xs] =>
       xs
       |> List.fold_left(
-           ((before, is_array'), next) => (next, is_array' && before == next),
-           (x, true)
+           ((before, is_array'), next) => (
+             next,
+             is_array' && before == next,
+           ),
+           (x, true),
          )
       |> (((_, x)) => x);
   let definition = Impl.definition(format);

@@ -31,14 +31,11 @@
     "url": "https://github.com/kogai/typed_i18n/issues"
   },
   "homepage": "https://github.com/kogai/typed_i18n#readme",
-  "dependencies": {
+  "devDependencies": {
     "bs-cmdliner": "^0.1.0",
     "bs-easy-format": "^0.1.0",
     "bs-platform": "^2.2.2",
-    "webpack": "^4.4.1"
-  },
-  "devDependencies": {
-    "browserify": "^16.1.1",
+    "webpack": "^4.4.1",
     "webpack-cli": "^2.0.13"
   }
 }

@@ -27,7 +27,7 @@ let member = (key: string, json: Js.Json.t) : Js.Json.t => {
       | None => raise(Not_found)
       }
     | Js.Json.JSONArray(xs) =>
-      try xs[int_of_string(k)] {
+      try (xs[int_of_string(k)]) {
       | Invalid_argument(_) => raise(Not_found)
       }
     | JSONFalse => Js.Json.boolean(Js.false_)

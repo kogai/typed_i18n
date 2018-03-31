@@ -27,7 +27,4 @@ test:
 .PHONY: publish
 publish:
 	npm version patch
-	make $(NAME).js
-	git commit -a -m "bump bin"
-	git push
 	npm publish --access public

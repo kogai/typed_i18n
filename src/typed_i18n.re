@@ -4,13 +4,13 @@ open Easy_format;
 external pkg : {
   .
   "version": string,
-  "name": string
+  "name": string,
 } =
   "../package.json";
 
 type ty = {
   path: string,
-  value: Js.Json.t
+  value: Js.Json.t,
 };
 
 exception Unreachable;
@@ -33,7 +33,7 @@ module Flow = {
         "declare function %s(_: \"%s\", _?: {}): %s;",
         fname,
         path,
-        typedef
+        typedef,
       );
     Atom(result, atom);
   };
@@ -83,9 +83,10 @@ let rec walk = (~path="", value) =>
     let current = {path, value};
     let children =
       List.fold_left(
-        (acc, (k, v)) => List.append(acc, walk(~path=insert_dot(path, k), v)),
+        (acc, (k, v)) =>
+          List.append(acc, walk(~path=insert_dot(path, k), v)),
         [],
-        xs |> Js.Dict.entries |> Array.to_list
+        xs |> Js.Dict.entries |> Array.to_list,
       );
     path == "" ? children : [current, ...children];
   | Js.Json.JSONArray(xs) =>
@@ -98,7 +99,7 @@ let rec walk = (~path="", value) =>
           List.append(acc, walk(~path, x));
         },
         [],
-        xs |> Array.to_list |> Utils.with_idx
+        xs |> Array.to_list |> Utils.with_idx,
       );
     [current, ...children];
   | _ => [{path, value}]
@@ -110,7 +111,7 @@ module Logger: {
 } = {
   type t = [ | `Warn | `Error | `Info];
   let log = (level, msg) => {
-    switch level {
+    switch (level) {
     | `Info => Printf.printf("\027[1;32m[INFO]: \027[0m")
     | `Warn => Printf.printf("\027[1;33m[WARN]: \027[0m")
     | `Error => Printf.printf("\027[1;31m[ERROR]: \027[0m")
@@ -125,7 +126,7 @@ module Compatible: {
   let check: ((string, Js.Json.t), (string, Js.Json.t)) => unit;
 } = {
   let rec find = (tree, key) =>
-    switch (Belt.List.ofArray(Js.String.split(key, "."))) {
+    switch (Belt.List.fromArray(Js.String.split(key, "."))) {
     | []
     | [""] => raise(Unreachable)
     | [k] =>
@@ -143,7 +144,7 @@ module Compatible: {
     | [k, ...ks] =>
       find(
         Utils.member(k, tree),
-        Js.Array.joinWith(".", Belt.List.toArray(ks))
+        Js.Array.joinWith(".", Belt.List.toArray(ks)),
       )
     };
   let correct = (primary, secondary) => {
@@ -173,21 +174,32 @@ module Compatible: {
             `Warn,
             "[%s] and [%s] are not compatible\n",
             p_lang,
-            s_lang
+            s_lang,
           );
         };
         errors;
       }
     )
-    |> (errors => {
-      switch (Belt.List.splitAt(errors, 10)) {
-      | Some((xs, ys)) => {
-        List.iter(path => Logger.log(`Warn, "[%s] isn't compatible\n", path), xs);
-        Logger.log(`Warn, "And there are [%i] imcompatibles left\n", List.length(ys))
-      }
-      | None => List.iter(path => Logger.log(`Warn, "[%s] isn't compatible\n", path), errors)
-      };
-    });
+    |> (
+      errors =>
+        switch (Belt.List.splitAt(errors, 10)) {
+        | Some((xs, ys)) =>
+          List.iter(
+            path => Logger.log(`Warn, "[%s] isn't compatible\n", path),
+            xs,
+          );
+          Logger.log(
+            `Warn,
+            "And there are [%i] imcompatibles left\n",
+            List.length(ys),
+          );
+        | None =>
+          List.iter(
+            path => Logger.log(`Warn, "[%s] isn't compatible\n", path),
+            errors,
+          )
+        }
+    );
 };
 
 let check_compatibility =
@@ -198,9 +210,9 @@ let check_compatibility =
       ((other_lang, other_json)) =>
         Compatible.check(
           (primary_lang, primary_json),
-          (other_lang, other_json)
+          (other_lang, other_json),
         ),
-      rest_langs
+      rest_langs,
     );
 
 let handle_language =
@@ -208,7 +220,7 @@ let handle_language =
   let gather_langs =
     Js.Json.(
       fun
-      | JSONObject(x) => Belt.List.ofArray(Js.Dict.entries(x))
+      | JSONObject(x) => Belt.List.fromArray(Js.Dict.entries(x))
       | _ => []
     );
   let languages = gather_langs(Js.Json.classify(json));
@@ -226,7 +238,7 @@ let handle_language =
             };
           (name, walk(json));
         },
-        namespaces
+        namespaces,
       )
     | _ => raise(Unreachable)
   );
@@ -251,7 +263,7 @@ let translate =
         }
       );
     },
-    languages
+    languages,
   );
 
 module Cmd: {
@@ -265,7 +277,9 @@ module Cmd: {
   let version = "Version: " ++ pkg##version;
   let input = {
     let doc = "Path of source locale file";
-    Arg.(value & opt(string, "") & info(["i", "input"], ~docv="INPUT", ~doc));
+    Arg.(
+      value & opt(string, "") & info(["i", "input"], ~docv="INPUT", ~doc)
+    );
   };
   let output = {
     let doc = "Directory of output distination";
@@ -276,7 +290,9 @@ module Cmd: {
   let prefer = {
     let doc = "Preferred language";
     Arg.(
-      value & opt(string, "en") & info(["p", "prefer"], ~docv="PREFER", ~doc)
+      value
+      & opt(string, "en")
+      & info(["p", "prefer"], ~docv="PREFER", ~doc)
     );
   };
   let namespaces = {
@@ -333,7 +349,7 @@ module Cmd: {
 let () = {
   let argv =
     Sys.argv
-    |> Belt.List.ofArray
+    |> Belt.List.fromArray
     |> Belt.List.tail
     |> (
       fun
