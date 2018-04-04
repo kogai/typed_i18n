@@ -126,11 +126,11 @@ module Compatible: {
   let check: ((string, Js.Json.t), (string, Js.Json.t)) => unit;
 } = {
   let rec find = (tree, key) =>
-    switch (Belt.List.fromArray(Js.String.split(key, "."))) {
+    switch (Belt.List.fromArray(Js.String.split(".", key))) {
     | []
     | [""] => raise(Unreachable)
     | [k] =>
-      let r = Js.Re.fromString("^\\[\\([0-9]\\)\\]$");
+      let r = Js.Re.fromString("^\\[([0-9])\\]$");
       switch (Js.String.match(r, k)) {
       | Some(rs) =>
         let idx =
