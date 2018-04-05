@@ -8,7 +8,7 @@
     "build": "make src/typed_i18n.bs.js",
     "build:production": "make lib/bundle.bs.js",
     "watch": "bsb -make-world -w",
-    "test": "cd example && yarn test",
+    "test": "yarn test:unit && cd example && yarn test",
     "test:unit": "make __tests__/typed_i18n_test.bs.js && yarn jest",
     "test:unit:watch": "yarn jest --watch",
     "start": "yarn build && node src/typed_i18n.bs.js",
