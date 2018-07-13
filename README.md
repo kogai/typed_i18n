@@ -24,15 +24,14 @@ as
 
 ```javascript
 // @flow
-
 declare function t(_: "foo"): {
   +bar: string,
-  +buzz: number,
+  +buzz: number
 };
 declare function t(_: "foo.bar"): string;
 declare function t(_: "foo.buzz"): number;
 
-export type TFunction = typeof t
+export type TFunction = typeof t;
 ```
 
 or
@@ -56,19 +55,19 @@ then if you use TFunction like below, type-checker warn you function call by inv
 ```javascript
 // @flow
 
-import type { TFunction } from './locale.translation'; // Definition file generated
+import type { TFunction } from "./locale.translation"; // Definition file generated
 
 declare var t: TFunction;
 
 // Those are ok
-const x: { bar: string, buzz: number } = t("foo")
+const x: { bar: string, buzz: number } = t("foo");
 const x1: string = x.bar;
 const x2: number = x.buzz;
 // Expect error
 const x3 = x.buzzz;
 
 // Expect error
-const y = t("fooo")
+const y = t("fooo");
 
 // Those are also strictly typed too
 const z1: string = t("foo.bar");
@@ -81,6 +80,9 @@ const z2: number = t("foo.buzz");
 # Basic usage
 $ typed_i18n -i path/to/your.json -o path/to/out/dir
 
+# Support also typescript
+$ typed_i18n -i path/to/your.json -o path/to/out/dir -l typescript
+
 # You can specify namespaces instead of default "translation"
-$ typed_i18n ... -n translate -n my-namespace -n  other-namespace
+$ typed_i18n -i path/to/your.json -o path/to/out/dir -n translate -n my-namespace -n other-namespace
 ```
