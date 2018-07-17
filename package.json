@@ -34,12 +34,12 @@
   },
   "homepage": "https://github.com/kogai/typed_i18n#readme",
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.4.2",
-    "bs-cmdliner": "^0.1.0",
-    "bs-easy-format": "^0.1.0",
-    "bs-json": "^1.0.1",
-    "bs-platform": "^2.2.2",
-    "webpack": "^4.4.1",
-    "webpack-cli": "^2.0.13"
+    "@glennsl/bs-jest": "0.4.2",
+    "bs-cmdliner": "0.1.0",
+    "bs-easy-format": "0.1.0",
+    "bs-json": "1.0.1",
+    "bs-platform": "2.2.3",
+    "webpack": "4.4.1",
+    "webpack-cli": "2.0.13"
   }
 }
