@@ -1,32 +1,93 @@
 version: 2
-jobs:
-  build:
+references:
+  docker_container_of_nodejs: &docker_container_of_nodejs
     docker:
-      - image: circleci/node:8.9.4
+      - image: circleci/node:8.11.3
     working_directory: ~/typed_i18n
+  install_yarn: &install_yarn
+    run:
+      name: Install yarn
+      command: sudo npm i -g yarn@1.7.0
+  restore_cache: &restore_cache
+    restore_cache:
+      name: Restore yarn cache
+      keys:
+        - yarn-{{ checksum "yarn.lock" }}
+        - yarn-
+  install_node_modules: &install_node_modules
+    run:
+      name: Install dependencies
+      command: |
+        yarn install --prefer-offline
+        yarn build
+        cd example && yarn install --prefer-offline
+  save_cache: &save_cache
+    save_cache:
+      name: Save yarn cache
+      key: yarn-{{ checksum "yarn.lock" }}
+      paths:
+        - ~/.yarn
+        - ~/.cache/yarn
+        - ~/typed_i18n/node_modules
+  persist: &persist
+    persist_to_workspace:
+      name: Persist to workspace
+      root: /home/circleci/typed_i18n
+      paths:
+        - node_modules
+        - example/node_modules
+        - lib
+  restore: &restore
+    attach_workspace:
+      name: Restore from workspace
+      at: /home/circleci/typed_i18n
+jobs:
+  install_dependencies:
+    <<: *docker_container_of_nodejs
     steps:
       - checkout
-      - restore_cache:
-          name: Restore cache
-          keys:
-            - >-
-              cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum
-              "example/yarn.lock" }}
-      - run:
-          name: Install dependencies
-          command: |
-            yarn install
-            yarn build
-            cd example && yarn install
-      - save_cache:
-          name: Save cache
-          paths:
-            - ~/.yarn
-            - ~/typed_i18n/node_modules
-            - ~/typed_i18n/example/node_modules
-          key: >-
-            cache-key-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum
-            "example/yarn.lock" }}
+      - *install_yarn
+      - *restore_cache
+      - *install_node_modules
+      - *save_cache
+      - *persist
+  build:
+    <<: *docker_container_of_nodejs
+    steps:
+      - checkout
+      - *restore
       - run:
           name: Run tests
           command: yarn test
+  npm_update:
+    <<: *docker_container_of_nodejs
+    steps:
+      - checkout
+      - *restore
+      - run:
+          name: Update
+          command: |
+            npx renovate --token "$GITHUB_ACCESS_TOKEN_RENOVATE" kogai/typed_i18n
+            cd example && npx renovate --token "$GITHUB_ACCESS_TOKEN_RENOVATE" kogai/typed_i18n
+  
+workflows:
+  version: 2
+  ordinary_workflow:
+    jobs:
+      - install_dependencies
+      - build:
+          requires:
+            - install_dependencies
+  update:
+    triggers:
+      - schedule:
+          cron: "0 15 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - install_dependencies
+      - npm_update:
+          requires:
+            - install_dependencies
