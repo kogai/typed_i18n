@@ -22,6 +22,10 @@
   dependencies:
     jest "^23.5.0"
 
+"@glennsl/bs-json@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@glennsl/bs-json/-/bs-json-2.0.0.tgz#e621aac1e94d49bc12bf493b67c01c39e61a6415"
+
 "@webassemblyjs/ast@1.5.13":
   version "1.5.13"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.5.13.tgz#81155a570bd5803a30ec31436bc2c9c0ede38f25"
@@ -701,10 +705,6 @@ bs-cmdliner@0.1.0:
 bs-easy-format@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/bs-easy-format/-/bs-easy-format-0.1.0.tgz#4dbc100a19ee06190b34183a336e6892fd460ed9"
-
-bs-json@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/bs-json/-/bs-json-1.0.1.tgz#0e25ed5ba7164ab131e494669b755da9844cc37e"
 
 bs-platform@4.0.0:
   version "4.0.0"
