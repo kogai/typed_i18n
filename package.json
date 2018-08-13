@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/kogai/typed_i18n#readme",
   "devDependencies": {
-    "@glennsl/bs-jest": "0.4.2",
+    "@glennsl/bs-jest": "0.4.3",
     "bs-cmdliner": "0.1.0",
     "bs-easy-format": "0.1.0",
     "bs-json": "1.0.1",
