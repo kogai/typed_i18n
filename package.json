@@ -39,7 +39,7 @@
     "bs-easy-format": "0.1.0",
     "bs-json": "1.0.1",
     "bs-platform": "2.2.3",
-    "webpack": "4.16.3",
+    "webpack": "4.17.1",
     "webpack-cli": "3.1.0"
   }
 }
