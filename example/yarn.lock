@@ -6,6 +6,6 @@ flow-bin@^0.80.0:
   version "0.80.0"
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.80.0.tgz#04cc1ee626a6f50786f78170c92ebe1745235403"
 
-typescript@^2.7.0-dev.20171027:
-  version "2.7.0-dev.20171027"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.0-dev.20171027.tgz#caf2c8d675e1d121bc4c4a17ae6bf924feb3feb5"
+typescript@^3.0.0:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.3.tgz#4853b3e275ecdaa27f78fda46dc273a7eb7fc1c8"
