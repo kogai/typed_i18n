@@ -30,8 +30,8 @@ let member = (key: string, json: Js.Json.t) : Js.Json.t => {
       try (xs[int_of_string(k)]) {
       | Invalid_argument(_) => raise(Not_found)
       }
-    | JSONFalse => Js.Json.boolean(Js.false_)
-    | JSONTrue => Js.Json.boolean(Js.true_)
+    | JSONFalse => Js.Json.boolean(false)
+    | JSONTrue => Js.Json.boolean(true)
     | JSONNull => Js.Json.null
     | JSONNumber(x) => Js.Json.number(x)
     | JSONString(x) => Js.Json.string(x);
