@@ -23,6 +23,6 @@
   ],
   "bs-dev-dependencies": [
     "@glennsl/bs-jest",
-    "bs-json"
+    "@glennsl/bs-json"
   ]
 }
