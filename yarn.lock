@@ -22,9 +22,9 @@
   dependencies:
     jest "^23.5.0"
 
-"@glennsl/bs-json@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@glennsl/bs-json/-/bs-json-2.0.0.tgz#e621aac1e94d49bc12bf493b67c01c39e61a6415"
+"@glennsl/bs-json@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@glennsl/bs-json/-/bs-json-3.0.0.tgz#b4e1cf6612270a8dd7287a8a71ebe17e8f0fb683"
 
 "@webassemblyjs/ast@1.7.6":
   version "1.7.6"
