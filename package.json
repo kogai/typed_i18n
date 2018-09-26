@@ -39,7 +39,7 @@
     "bs-cmdliner": "0.1.0",
     "bs-easy-format": "0.1.0",
     "bs-platform": "4.0.5",
-    "webpack": "4.19.1",
+    "webpack": "4.20.1",
     "webpack-cli": "3.1.1"
   }
 }
