@@ -18,7 +18,7 @@
 *.annot
 *.cmj
 *.bak
-lib/bs
+lib
 *.mlast
 *.mliast
 .vscode
@@ -30,3 +30,5 @@ example/src/*.d.ts
 *.bs.js
 node_modules
 coverage
+src/Lexer.*
+src/Parser.*

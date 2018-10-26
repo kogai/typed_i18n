@@ -3,11 +3,51 @@
   "version": "0.1.0",
   "sources": [
     {
-      "dir": "src"
+      "dir": "../.opam/4.02.3/lib/menhirLib"
+    },
+    {
+      "dir": "src",
+      "generators": [
+        {
+          "name": "ocamllex",
+          "edge": ["Lexer.ml", ":", "Lexer.mll"]
+        },
+        {
+          "name": "menhir",
+          "edge": ["Parser.ml", "Parser.mli", ":", "Parser.mly"]
+        },
+        {
+          "name": "menhir2",
+          "edge": ["Parser.messages", ":", "Parser.mly"]
+        },
+        {
+          "name": "menhir3",
+          "edge": ["ParseErrors.ml", ":", "Parser.messages"]
+        }
+      ]
     },
     {
       "dir": "__tests__",
       "type": "dev"
+    }
+  ],
+  "generators": [
+    {
+      "name": "ocamllex",
+      "command": "ocamllex $in"
+    },
+    {
+      "name": "menhir",
+      "command": "menhir --explain --table $in"
+    },
+    {
+      "name": "menhir2",
+      // Note: needs moreutils, e.g. `brew install moreutils`
+      "command": "menhir $in --update-errors $out | sponge $out"
+    },
+    {
+      "name": "menhir3",
+      "command": "menhir $src_root_dir/src/Parser.mly --compile-errors $in >| $out"
     }
   ],
   "package-specs": {

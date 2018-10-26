@@ -1,7 +1,8 @@
-type token = 
-  | start
-  | end
-  | body(string);
+type token =
+  | Start
+  | End
+  | Body(string);
+
 let captureBy = (startSymbol, endSymbol, str) =>
   Js.String.split("", str) |> Belt.List.fromArray |> ((x) => ["aaa"]);
 
