@@ -1,11 +1,18 @@
+type token = 
+  | start
+  | end
+  | body(string);
+let captureBy = (startSymbol, endSymbol, str) =>
+  Js.String.split("", str) |> Belt.List.fromArray |> ((x) => ["aaa"]);
+
 let rec range = (from, to_) =>
   if (from > to_) {
-    [];
+    []
   } else {
-    [from, ...range(from + 1, to_)];
+    [from, ...range(from + 1, to_)]
   };
 
-let with_idx = xs => List.combine(range(0, List.length(xs) - 1), xs);
+let with_idx = (xs) => List.combine(range(0, List.length(xs) - 1), xs);
 
 let find = (p, xs) =>
   try (Some(List.find(p, xs))) {
@@ -19,7 +26,7 @@ let rec last_exn =
   | [_, ...xs] => last_exn(xs);
 
 let member = (key: string, json: Js.Json.t) : Js.Json.t => {
-  let mem = k =>
+  let mem = (k) =>
     fun
     | Js.Json.JSONObject(xs) =>
       switch (Js.Dict.get(xs, k)) {
@@ -27,7 +34,7 @@ let member = (key: string, json: Js.Json.t) : Js.Json.t => {
       | None => raise(Not_found)
       }
     | Js.Json.JSONArray(xs) =>
-      try (xs[int_of_string(k)]) {
+      try xs[int_of_string(k)] {
       | Invalid_argument(_) => raise(Not_found)
       }
     | JSONFalse => Js.Json.boolean(false)
@@ -35,5 +42,5 @@ let member = (key: string, json: Js.Json.t) : Js.Json.t => {
     | JSONNull => Js.Json.null
     | JSONNumber(x) => Js.Json.number(x)
     | JSONString(x) => Js.Json.string(x);
-  mem(key, Js.Json.classify(json));
+  mem(key, Js.Json.classify(json))
 };

@@ -1,12 +1,15 @@
 {
   "name": "typed_i18n",
   "version": "0.1.0",
-  "sources": [{
-    "dir": "src"
-  }, {
-    "dir": "__tests__",
-    "type": "dev"
-  }],
+  "sources": [
+    {
+      "dir": "src"
+    },
+    {
+      "dir": "__tests__",
+      "type": "dev"
+    }
+  ],
   "package-specs": {
     "module": "commonjs",
     "in-source": true
@@ -17,12 +20,6 @@
     "error": "+101"
   },
   "refmt": 3,
-  "bs-dependencies": [
-    "bs-cmdliner",
-    "bs-easy-format"
-  ],
-  "bs-dev-dependencies": [
-    "@glennsl/bs-jest",
-    "@glennsl/bs-json"
-  ]
+  "bs-dependencies": ["bs-cmdliner", "bs-easy-format"],
+  "bs-dev-dependencies": ["@glennsl/bs-jest", "@glennsl/bs-json"]
 }

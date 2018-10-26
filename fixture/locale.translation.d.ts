@@ -1,6 +1,7 @@
 declare namespace typed_i18n {
   interface TFunction {
-  (_: "title", __?: {}): string; (_: "body_copies", __?: {}): string[];
+  (_: "title", __?: {}): string; (_: "interpolation", __?: {}): string;
+  (_: "body_copies", __?: {}): string[];
   (_: "body_copies.[0]", __?: {}): string;
   (_: "body_copies.[1]", __?: {}): string;
   (_: "body_copies.[2]", __?: {}): string;

@@ -2,6 +2,7 @@
   "ja": {
     "translation": {
       "title": "タイトル",
+      "interpolation": "私は{{ something }}を持っています",
       "body_copies": [
         "これは",
         "本文",

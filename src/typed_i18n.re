@@ -11,6 +11,7 @@ external pkg : {
 type ty = {
   path: string,
   value: Js.Json.t,
+  interpolations: list(string),
 };
 
 exception Unreachable;
@@ -25,14 +26,14 @@ module Flow = {
   type t = ty;
   let extension = "js.flow";
   let read_only_tag = Some("+");
-  let definition = (format, {path, value}) => {
+  let definition = (format, {path, value, interpolations}) => {
     let fname = "t";
     let typedef = Easy_format.Pretty.to_string @@ format(value);
-    let result =
-      Format.sprintf(
-        "declare function %s(_: \"%s\", _?: {}): %s;",
+    let result = Format.sprintf(
+        "declare function %s(_: \"%s\", _?: {%s}): %s;",
         fname,
         path,
+        List.map(Printf.sprintf("%s: any"), interpolations) |> String.concat(",\n"),
         typedef,
       );
     Atom(result, atom);
@@ -48,9 +49,14 @@ module Typescript = {
   type t = ty;
   let extension = "d.ts";
   let read_only_tag = Some("readonly ");
-  let definition = (format, {path, value}) => {
+  let definition = (format, {path, value, interpolations}) => {
     let typedef = Easy_format.Pretty.to_string @@ format(value);
-    Atom(Format.sprintf("(_: \"%s\", __?: {}): %s", path, typedef), atom);
+    Atom(Format.sprintf(
+      "(_: \"%s\", __?: {%s}): %s",
+      path, 
+      List.map(Printf.sprintf("%s: any"), interpolations) |> String.concat(",\n"),
+      typedef
+    ), atom);
   };
   let definitions = contents => {
     let methods = List(("interface TFunction {", ";", "}", list), contents);
@@ -80,7 +86,7 @@ let insert_dot = (k1, k2) =>
 let rec walk = (~path="", value) =>
   switch (Js.Json.classify(value)) {
   | Js.Json.JSONObject(xs) =>
-    let current = {path, value};
+    let current = {path, value, interpolations: []};
     let children =
       List.fold_left(
         (acc, (k, v)) =>
@@ -90,7 +96,7 @@ let rec walk = (~path="", value) =>
       );
     path == "" ? children : [current, ...children];
   | Js.Json.JSONArray(xs) =>
-    let current = {path, value};
+    let current = {path, value, interpolations: []};
     let children =
       List.fold_left(
         (acc, (i, x)) => {
@@ -102,7 +108,23 @@ let rec walk = (~path="", value) =>
         xs |> Array.to_list |> Utils.with_idx,
       );
     [current, ...children];
-  | _ => [{path, value}]
+  | Js.Json.JSONString(s)=> {
+    /* let interpolations = Utils.captureBy("{{", "}}", s); */
+    /* let interpolations = switch (Js.Re.exec(s, r)) {
+    | Some(xs) => {
+      Js.log(xs);
+      /* Js.Re.captures(xs)
+        |> Belt.List.fromArray |> List.map(Js.toOption) |> List.filter(Belt.Option.isSome) |> List.map(Belt.Option.getExn) */
+        ["something"]
+    }
+    | None => []
+    }; */
+    [{path, value, interpolations: Utils.captureBy("{{", "}}", s) }]
+  }
+  | _ => {
+    let _ = Printf.sprintf("Value is");
+    [{path, value, interpolations: []}]
+  } 
   };
 
 module Logger: {

@@ -1,6 +1,7 @@
 // @flow
 
 declare function t(_: "title", _?: {}): string;
+declare function t(_: "interpolation", _?: {something: any}): string;
 declare function t(_: "body_copies", _?: {}): string[];
 declare function t(_: "body_copies.[0]", _?: {}): string;
 declare function t(_: "body_copies.[1]", _?: {}): string;
