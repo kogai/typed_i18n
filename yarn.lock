@@ -16,9 +16,9 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@glennsl/bs-jest@0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@glennsl/bs-jest/-/bs-jest-0.4.4.tgz#71cd14217023efd14e09f0030c08f2103e90d734"
+"@glennsl/bs-jest@0.4.6":
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/@glennsl/bs-jest/-/bs-jest-0.4.6.tgz#2a249a46c10caaa9756b5e30dcf60a2c1dde57ea"
   dependencies:
     jest "^23.5.0"
 
