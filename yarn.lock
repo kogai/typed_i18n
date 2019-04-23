@@ -708,9 +708,9 @@ bs-easy-format@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/bs-easy-format/-/bs-easy-format-0.1.0.tgz#4dbc100a19ee06190b34183a336e6892fd460ed9"
 
-bs-platform@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-5.0.0.tgz#f9fded818bafc3891aeb85eb4e0d95b8d8f8b4d7"
+bs-platform@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-5.0.1.tgz#0e7a50a1b51896d3ff4e1df6e79d32530ba062f5"
 
 bser@^2.0.0:
   version "2.0.0"
