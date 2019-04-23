@@ -77,14 +77,14 @@ let insert_dot = (k1, k2) =>
   };
 
 /* json -> t list */
-let rec walk = (~path="", value) =>
+let rec walk = (~path="", ~current_depth=0, ~max_depth, value) =>
   switch (Js.Json.classify(value)) {
   | Js.Json.JSONObject(xs) =>
     let current = {path, value};
     let children =
       List.fold_left(
         (acc, (k, v)) =>
-          List.append(acc, walk(~path=insert_dot(path, k), v)),
+          List.append(acc, walk(~path=insert_dot(path, k), ~max_depth, v)),
         [],
         xs |> Js.Dict.entries |> Array.to_list,
       );
@@ -96,7 +96,7 @@ let rec walk = (~path="", value) =>
         (acc, (i, x)) => {
           let path =
             insert_dot(path, Format.sprintf("[%s]", string_of_int(i)));
-          List.append(acc, walk(~path, x));
+          List.append(acc, walk(~path, ~max_depth, x));
         },
         [],
         xs |> Array.to_list |> Utils.with_idx,
@@ -122,8 +122,8 @@ module Logger: {
 
 module Compatible: {
   let find: (Js.Json.t, string) => Js.Json.t;
-  let correct: (Js.Json.t, Js.Json.t) => list(string);
-  let check: ((string, Js.Json.t), (string, Js.Json.t)) => unit;
+  let correct: (~max_depth: int, Js.Json.t, Js.Json.t) => list(string);
+  let check: (~max_depth: int, (string, Js.Json.t), (string, Js.Json.t)) => unit;
 } = {
   let rec find = (tree, key) =>
     switch (Belt.List.fromArray(Js.String.split(".", key))) {
@@ -147,14 +147,14 @@ module Compatible: {
         Js.Array.joinWith(".", Belt.List.toArray(ks)),
       )
     };
-  let correct = (primary, secondary) => {
+  let correct = (~max_depth, primary, secondary) => {
     let impl = create_translator("flow");
     module Impl = (val impl);
     module M = Translate.Translator(Impl);
     let type_of_json = json =>
       json |> M.format |> Easy_format.Pretty.to_string;
     primary
-    |> walk
+    |> walk(~max_depth)
     |> List.map(({path, value}) => {
          let is_match =
            try (type_of_json(find(secondary, path)) == type_of_json(value)) {
@@ -165,8 +165,8 @@ module Compatible: {
     |> List.filter(((_, is_match)) => ! is_match)
     |> List.map(((x, _)) => x);
   };
-  let check = ((p_lang, p_json), (s_lang, s_json)) =>
-    correct(p_json, s_json)
+  let check = (~max_depth, (p_lang, p_json), (s_lang, s_json)) =>
+    correct(~max_depth, p_json, s_json)
     |> (
       errors => {
         if (List.length(errors) > 0) {
@@ -202,13 +202,14 @@ module Compatible: {
     );
 };
 
-let check_compatibility =
+let check_compatibility = (~max_depth: int) =>
   fun
   | [] => raise @@ Invalid_language_key(None)
   | [(primary_lang, primary_json), ...rest_langs] =>
     List.iter(
       ((other_lang, other_json)) =>
         Compatible.check(
+          ~max_depth,
           (primary_lang, primary_json),
           (other_lang, other_json),
         ),
@@ -216,7 +217,7 @@ let check_compatibility =
     );
 
 let handle_language =
-    (prefer_lang: string, namespaces: list(string), json: Js.Json.t) => {
+    (~max_depth: int, prefer_lang: string, namespaces: list(string), json: Js.Json.t) => {
   let gather_langs =
     Js.Json.(
       fun
@@ -224,7 +225,7 @@ let handle_language =
       | _ => []
     );
   let languages = gather_langs(Js.Json.classify(json));
-  check_compatibility(languages);
+  check_compatibility(~max_depth, languages);
   languages
   |> Utils.find(((l, _)) => l == prefer_lang)
   |> (
@@ -236,7 +237,7 @@ let handle_language =
             try (Utils.member(name, json)) {
             | Not_found => raise @@ Invalid_namespace_key(name)
             };
-          (name, walk(json));
+          (name, walk(json, ~max_depth));
         },
         namespaces,
       )
@@ -269,7 +270,7 @@ let translate =
 module Cmd: {
   let name: string;
   let version: string;
-  let run: (string, string, string, list(string), list(string)) => unit;
+  let run: (string, string, string, list(string), list(string), int) => unit;
   let term: Cmdliner.Term.t(unit);
 } = {
   open Cmdliner;
@@ -311,12 +312,20 @@ module Cmd: {
       & info(["l", "languages"], ~docv="LANGUAGES", ~doc)
     );
   };
-  let run = (input_file, output_dir, prefer, namespaces, languages) =>
+  let max_depth = {
+    let doc = "Max depth of dictionary JSON tree";
+    Arg.(
+      value
+      & opt(int, 256)
+      & info(["d", "max_depth"], ~docv="MAX_DEPTH", ~doc)
+    );
+  };
+  let run = (input_file, output_dir, prefer, namespaces, languages, max_depth) =>
     try (
       input_file
       |> Node.Fs.readFileSync(_, `utf8)
       |> Js.Json.parseExn
-      |> handle_language(prefer, namespaces)
+      |> handle_language(~max_depth, prefer, namespaces)
       |> List.iter(translate(~input_file, ~output_dir, ~languages))
     ) {
     | Invalid_namespace_key(key) =>
@@ -343,7 +352,7 @@ module Cmd: {
       raise(e);
     };
   let term =
-    Term.(const(run) $ input $ output $ prefer $ namespaces $ languages);
+    Term.(const(run) $ input $ output $ prefer $ namespaces $ languages $ max_depth);
 };
 
 let () = {
