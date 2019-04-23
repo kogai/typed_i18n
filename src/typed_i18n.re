@@ -77,33 +77,37 @@ let insert_dot = (k1, k2) =>
   };
 
 /* json -> t list */
-let rec walk = (~path="", ~current_depth=0, ~max_depth, value) =>
+let rec walk = (~path="", ~current_depth=0, ~max_depth, value) => {
   switch (Js.Json.classify(value)) {
+  | _ when current_depth >= (max_depth + 1) => []
   | Js.Json.JSONObject(xs) =>
     let current = {path, value};
+    let next_depth = current_depth + 1;
     let children =
       List.fold_left(
         (acc, (k, v)) =>
-          List.append(acc, walk(~path=insert_dot(path, k), ~max_depth, v)),
+          List.append(acc, walk(~path=insert_dot(path, k), ~current_depth=next_depth, ~max_depth, v)),
         [],
         xs |> Js.Dict.entries |> Array.to_list,
       );
     path == "" ? children : [current, ...children];
   | Js.Json.JSONArray(xs) =>
     let current = {path, value};
+    let next_depth = current_depth + 1;
     let children =
       List.fold_left(
         (acc, (i, x)) => {
           let path =
             insert_dot(path, Format.sprintf("[%s]", string_of_int(i)));
-          List.append(acc, walk(~path, ~max_depth, x));
+          List.append(acc, walk(~path, ~current_depth=next_depth, ~max_depth, x));
         },
         [],
         xs |> Array.to_list |> Utils.with_idx,
       );
     [current, ...children];
   | _ => [{path, value}]
-  };
+  }
+};
 
 module Logger: {
   type t = [ | `Warn | `Error | `Info];
@@ -316,7 +320,7 @@ module Cmd: {
     let doc = "Max depth of dictionary JSON tree";
     Arg.(
       value
-      & opt(int, 256)
+      & opt(int, 255)
       & info(["d", "max_depth"], ~docv="MAX_DEPTH", ~doc)
     );
   };
