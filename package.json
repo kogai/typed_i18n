@@ -38,7 +38,7 @@
     "@glennsl/bs-json": "4.0.0",
     "bs-cmdliner": "0.1.0",
     "bs-easy-format": "0.1.0",
-    "bs-platform": "5.0.4",
+    "bs-platform": "5.0.6",
     "webpack": "4.35.2",
     "webpack-cli": "3.3.5"
   }
