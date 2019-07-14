@@ -40,6 +40,6 @@
     "bs-easy-format": "0.1.0",
     "bs-platform": "5.0.6",
     "webpack": "4.35.3",
-    "webpack-cli": "3.3.5"
+    "webpack-cli": "3.3.6"
   }
 }
