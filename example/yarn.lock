@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-flow-bin@0.109.0:
-  version "0.109.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.109.0.tgz#dcdcb7402dd85b58200392d8716ccf14e5a8c24c"
+flow-bin@0.111.1:
+  version "0.111.1"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.111.1.tgz#bfc1ff91927d0500aa869b0b3a48dd4b060c15c0"
 
 typescript@3.6.4:
   version "3.6.4"
