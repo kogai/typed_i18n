@@ -13,7 +13,7 @@
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
-    "flow-bin": "0.124.0",
+    "flow-bin": "0.125.1",
     "typescript": "3.9.2"
   }
 }
