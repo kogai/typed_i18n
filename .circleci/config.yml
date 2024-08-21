@@ -2,7 +2,7 @@ version: 2
 references:
   docker_container_of_nodejs: &docker_container_of_nodejs
     docker:
-      - image: circleci/node:8.12.0
+      - image: circleci/node:17.2.0
     working_directory: ~/typed_i18n
   install_yarn: &install_yarn
     run:
