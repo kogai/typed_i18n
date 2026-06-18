@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: yarn
+
+      # `yarn install` runs the `prepublish` script, which builds the
+      # production bundle (lib/bundle.bs.js) used by the example below.
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Unit tests
+        run: yarn test:unit
+
+      - name: Install example dependencies
+        working-directory: example
+        run: yarn install --frozen-lockfile
+
+      - name: Example (flow & tsc) tests
+        working-directory: example
+        run: yarn test
