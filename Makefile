@@ -7,7 +7,7 @@ SRC_FILES += package.json
 SRC_DIRS := "src"
 OPAM_VER := 4.03.0
 ARGS := -i fixture/locale.json -o fixture -p ja -l flow -l typescript
-NPM_BIN := $(shell npm bin)
+NPM_BIN := ./node_modules/.bin
 
 src/$(NAME).$(EXT): $(SRC_FILES)
 	$(NPM_BIN)/bsb -make-world
@@ -16,7 +16,7 @@ __tests__/$(NAME)_test.$(EXT): $(SRC_FILES)
 	$(NPM_BIN)/bsb -make-world
 
 lib/bundle.$(EXT): src/$(NAME).$(EXT)
-	$(NPM_BIN)/webpack src/$(NAME).$(EXT) -p -o lib/bundle.$(EXT) --target=node
+	$(NPM_BIN)/webpack --config webpack.config.js
 
 .PHONY: run
 run:
