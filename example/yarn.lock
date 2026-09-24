@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-flow-bin@0.126.1:
-  version "0.126.1"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.126.1.tgz#2726595e1891dc35b379b5994627432df4ead52c"
-  integrity sha512-RI05x7rVzruRVJQN3M4vLEjZMwUHJKhGz9FmL8HN7WiSo66/131EyJS6Vo8PkKyM2pgT9GRWfGP/tXlqS54XUg==
+flow-bin@0.333.0:
+  version "0.333.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.333.0.tgz#6f44cb45b7772ab1a8a0ad9bb658de9ea0953c18"
+  integrity sha512-cDI5lcb0mbWUmkKs09hTaPEprQzrV+XKp1YzBLgNG13uzr1kM3qhYxZFx766f3an7LmD2lD9BzNbNu+hw4YHew==
 
 typescript@5.9.3:
   version "5.9.3"
